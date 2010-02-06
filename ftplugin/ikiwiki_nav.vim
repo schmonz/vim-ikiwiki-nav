@@ -191,22 +191,16 @@ endif "}}}1
 " base_path must have wiki_root as a prefix; an exception is raised otherwise
 "
 if !exists("*s:GenPosLinkLoc") " {{{1
-  function s:GenPosLinkLoc(wiki_root, base_path)
-    let wiki_root = a:wiki_root
+  function s:GenPosLinkLoc(base_path)
     let base_path = a:base_path
-    let bpo = base_path
-    let base_path = substitute(base_path, wiki_root . '/\|' . wiki_root . '$', '', '')
-    if base_path == bpo
-      throw 'IWNAV:INVALID_BASE('.base_path.', '.wiki_root.')'
-    endif
     let pos_locs = []
     while base_path != ''
-      call add(pos_locs, wiki_root . '/' . base_path)
+      call add(pos_locs, base_path)
 
       " remove rightmost path element, including its /
       let base_path = substitute(base_path, '/\?[^/]\+$', '', '')
     endwhile
-    call add(pos_locs, wiki_root)
+    call add(pos_locs, '/')
     return pos_locs
   endfunction
 endif " }}}1
@@ -222,19 +216,14 @@ if !exists("*s:GoToWikiPage") " {{{1
       echo "No wikilink found under the cursor"
       return
     endif
-    let ini_path = ''
-    let wiki_root = s:GetWikiRootDir()
-    if strlen(wiki_root) == 0
-      echo "Could not find wiki root dir - aborting"
-      return
-    endif
     if wl_text =~ '^/'
-      let ini_path = wiki_root
       let wl_text = strpart(wl_text, 1)
+      let dirs_tocheck = reverse(s:GenPosLinkLoc(expand('%:p:h')))
     else
-      let ini_path = expand('%:p:h').'/'.fnameescape(expand('%:p:t:r'))
+      let dirs_tocheck = s:GenPosLinkLoc(expand('%:p:h').'/'
+                                       \ .fnameescape(expand('%:p:t:r')))
     endif
-    for _path in s:GenPosLinkLoc(wiki_root, ini_path)
+    for _path in dirs_tocheck
       let plinkloc = s:BestLink2FName(_path, wl_text)
       let stdlinkform = plinkloc[0] " (dirs)/page.mdwn
       if strlen(stdlinkform[1]) == 0 && strlen(stdlinkform[2]) == 0
