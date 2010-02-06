@@ -267,9 +267,16 @@ endif " }}}1
 if !exists(":IkiJumpToPage")
   command IkiJumpToPage :call s:GoToWikiPage()
 endif
+if !exists(":IkiNextWikiLink")
+  command -nargs=1 IkiNextWikiLink :call s:NextWikiLink(<args>)
+endif
 
 if !(hasmapto(':IkiJumpToPage'))
   noremap <unique> <buffer> <CR> :IkiJumpToPage<CR>
+endif
+if !(hasmapto(':IkiNextWikiLink'))
+  noremap <buffer> <C-j> :IkiNextWikiLink 0<CR>
+  noremap <buffer> <C-k> :IkiNextWikiLink 1<CR>
 endif
 
 let &cpo = s:save_cpo
