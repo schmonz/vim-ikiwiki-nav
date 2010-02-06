@@ -32,6 +32,8 @@
 " Bugs: it only works with wikilinks contained in only one line. E.g.,
 " [[hi there|hi_there]] works, but [[hi
 " there|hi_there]] doesn't
+"
+" }}}1
 
 " {{{1 Searches the current line of the current buffer (where the cursor is
 " located) for anything that looks like a wikilink and that has the cursor
