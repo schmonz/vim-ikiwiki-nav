@@ -35,6 +35,14 @@
 "
 " }}}1
 
+if exists("b:loaded_ikiwiki_nav")
+  finish
+endif
+let b:loaded_ikiwiki_nav = 1
+
+let s:save_cpo = &cpo
+set cpo&vim
+
 " {{{1 Searches the current line of the current buffer (where the cursor is
 " located) for anything that looks like a wikilink and that has the cursor
 " placed on it, and returns its link text
@@ -234,6 +242,12 @@ if !exists("*s:GoToWikiPage") " {{{1
   endfunction
 endif " }}}1
 
-map <buffer> <CR> :call <SID>GoToWikiPage()<CR>
+if !exists(":IkiJumpToPage")
+  command IkiJumpToPage :call s:GoToWikiPage()
+endif
 
+if !(hasmapto(':IkiJumpToPage'))
+  noremap <unique> <buffer> <CR> :IkiJumpToPage<CR>
+endif
 
+let &cpo = s:save_cpo
