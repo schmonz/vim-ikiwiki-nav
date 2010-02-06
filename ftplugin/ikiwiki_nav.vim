@@ -43,6 +43,8 @@ let b:loaded_ikiwiki_nav = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
+let s:wl_pat = '\v\[\[[^\!\]][^\[\]]*\]\]'
+
 " {{{1 Searches the current line of the current buffer (where the cursor is
 " located) for anything that looks like a wikilink and that has the cursor
 " placed on it, and returns its link text
@@ -62,21 +64,20 @@ set cpo&vim
 " there|hi_there]]
 if !exists("*s:WikiLinkText") " {{{1
   function s:WikiLinkText()
-    let wl_pat = '\v\[\[[^\!\]][^\[\]]*\]\]'
     let start = 0
     let cpos = col(".") - 1
     let wl_ftext = ''
     while 1
-      let left_i = match(getline("."), wl_pat, start)
+      let left_i = match(getline("."), s:wl_pat, start)
       if left_i < 0
         return ''
       endif
       if left_i > cpos
         return ''
       endif 
-      let right_i = matchend(getline("."), wl_pat, start)
+      let right_i = matchend(getline("."), s:wl_pat, start)
       if cpos < right_i
-        let wl_ftext = matchstr(getline("."), wl_pat, start)
+        let wl_ftext = matchstr(getline("."), s:wl_pat, start)
         break
       endif
       let start = right_i
