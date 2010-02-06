@@ -1,5 +1,5 @@
 " vim: fdm=marker
-"
+" {{{1
 " Copyright: 2010 Javier Rojas <jerojasro@devnull.li>
 "
 " License:
@@ -32,32 +32,6 @@
 " Bugs: it only works with wikilinks contained in only one line. E.g.,
 " [[hi there|hi_there]] works, but [[hi
 " there|hi_there]] doesn't
-
-" {{{1 returns the directory which can be considered the root of the wiki the
-" current buffer belongs to, or an empty string if we are not inside an
-" ikiwiki wiki
-"
-" NOTE: the root of the wiki is considered the first directory that contains a
-" .ikiwiki folder, and is not $HOME/.ikiwiki (the usual ikiwiki libdir)
-"
-" if you can think of a better heuristic to get ikiwiki's root, let me know!
-if !exists("*s:GetWikiRootDir") " {{{1
-  function! s:GetWikiRootDir()
-    let check_str = '%:p:h'
-    let pos_wiki_root = expand(check_str)
-    while pos_wiki_root != '/'
-      if isdirectory(pos_wiki_root . '/.ikiwiki') && pos_wiki_root != $HOME
-        return pos_wiki_root
-      endif
-      let check_str = check_str . ':h'
-      let pos_wiki_root = expand(check_str)
-    endwhile
-    if isdirectory('/.ikiwiki')
-      return '/'
-    endif
-    return ''
-  endfunction
-endif " }}}1
 
 " {{{1 Searches the current line of the current buffer (where the cursor is
 " located) for anything that looks like a wikilink and that has the cursor
