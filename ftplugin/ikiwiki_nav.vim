@@ -243,6 +243,27 @@ if !exists("*s:GoToWikiPage") " {{{1
   endfunction
 endif " }}}1
 
+" {{{1
+" Moves the cursor to the nearest WikiLink in the buffer
+"
+" Arguments:
+"
+"   backwards: an int flag that determines the direction of the wikilink
+"   search.
+"
+"     backwards == 0: look forward
+"     backwards == 1: look backwards (surprise!)
+"
+if !exists("*s:NextWikiLink") " {{{1
+  function s:NextWikiLink(backwards)
+    let flags = 'W'
+    if (a:backwards)
+      let flags = flags . 'b'
+    endif
+    call search(s:wl_pat, flags)
+  endfunction
+endif " }}}1
+
 if !exists(":IkiJumpToPage")
   command IkiJumpToPage :call s:GoToWikiPage()
 endif
