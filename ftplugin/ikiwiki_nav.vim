@@ -279,4 +279,6 @@ if !(hasmapto(':IkiNextWikiLink'))
   noremap <buffer> <C-k> :IkiNextWikiLink 1<CR>
 endif
 
+noremap <buffer> <Backspace> <C-o>
+
 let &cpo = s:save_cpo
