@@ -243,8 +243,7 @@ if !exists("*s:GoToWikiPage") " {{{1
   endfunction
 endif " }}}1
 
-" {{{1
-" Moves the cursor to the nearest WikiLink in the buffer
+" {{{1 Moves the cursor to the nearest WikiLink in the buffer
 "
 " Arguments:
 "
