@@ -19,9 +19,9 @@
 " ftplugin to navigate ikiwiki links from within vim
 "
 " Author: Javier Rojas <jerojasro@devnull.li>
-" Version:  1.1
-" Last Updated: 2010-02-05
-" URL: http://git.devnull.li/cgi-bin/gitweb.cgi?p=vim-jerojasro.git;a=blob;f=.vim/ftplugin/ikiwiki_nav.vim;hb=HEAD
+" Version:  1.0
+" Last Updated: 2010-02-08
+" URL: http://git.devnull.li/cgi-bin/gitweb.cgi?p=ikiwiki-nav.git;a=blob;f=ftplugin/ikiwiki_nav.vim;hb=HEAD
 "
 " Usage: Hitting <CR> over a wikilink makes vim load the file associated with
 " it, if the file exists. To find the file associated with the wikilink, this
