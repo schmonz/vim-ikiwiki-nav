@@ -1,3 +1,4 @@
+  * replace all the hand-made path manipulation, with the fnamemodify function
   * Add docs in vim format
   * Recognize multiline wikilinks
   * Allow the automatic creation of the file (and its container directories, if
