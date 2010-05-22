@@ -28,24 +28,40 @@ if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
     if a:findstart == 1
       return s:FindCplStart()
     endif
-    let mrl = matchlist(base, '^\(\([^/]*/\)*\)\([^/]*\)$')
+    let completions = []
+    let mrl = matchlist(a:base, '^\(\([^/]*/\)*\)\([^/]*\)$')
     let baselink = mrl[1]
-    let wk_partialpage = mr[3]
+    let wk_partialpage = mrl[3]
     let dirs_tocheck = ikiwiki#nav#GenPosLinkLoc(expand('%:p:h').'/'
                                        \ .fnameescape(expand('%:p:t:r')))
-    if strlen(baselink) > 0
-      let baselink = strpart(baselink, 0, strlen(baselink) - 1) " strip last /
+    if strlen(baselink) == 0
+      " TODO check for .mdwn files and strip their extension
+      " TODO check for dirs and add a trailing /
+      " TODO account for dir/index.mdwn
+      call input('baselink 0')
       for _path in dirs_tocheck
-        let plinkloc = s:BestLink2FName(_path, baselink)
-        let exs_dir = plinkloc[0][0]
-        if strlen(exs_dir) != strlen(_path) + strlen(baselink) + 1
-          continue
-        endif
-        " check if path+baselink/wk_partialpage* exists
-        " if it does, add it to the completion list
+        call extend(completions, split(glob(_path . '/'.wk_partialpage.'*'), "\n"))
       endfor
+      return completions
     endif
-    return [a:base."foo", a:base."bar", a:base."baz"]
+    let baselink = strpart(baselink, 0, strlen(baselink) - 1) " strip last /
+    call input('baselink '.baselink)
+    for _path in dirs_tocheck
+      call input('path '._path)
+      let plinkloc = ikiwiki#nav#BestLink2FName(_path, baselink.'/dummy')
+      echo plinkloc
+      let exs_dir = plinkloc[0][0]
+      call input('exs_dir '.exs_dir)
+      if strlen(exs_dir) != strlen(_path) + strlen(baselink) + 1
+        call input('skipped')
+        continue
+      endif
+      " TODO check for .mdwn files and strip their extension
+      " TODO check for dirs and add a trailing /
+      " TODO account for dir/index.mdwn
+      call extend(completions, split(glob(exs_dir . '/'.wk_partialpage.'*'), "\n"))
+    endfor
+    return completions
   endfunction
 endif "}}}1
 
