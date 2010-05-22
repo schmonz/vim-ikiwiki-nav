@@ -25,13 +25,23 @@ endif "}}}1
 
 if !exists("*s:FormatCmpl") " {{{1
   function s:FormatCmpl(fsname, base, partialpage)
-    " TODO escape both base and partialpage to protect against alteration of the
-    " regexp
-    let pat = '\c' . a:base . '/' . a:partialpage . '[^/]*$'
-    if strlen(a:base) == 0
-      let pat = '\c' . a:partialpage . '[^/]*$'
+    let base = fnameescape(a:base)
+    let partialpage = fnameescape(a:partialpage)
+    let pat = '\c' . base . '/' . partialpage . '[^/]*$'
+    if strlen(base) == 0
+      let pat = '\c' . partialpage . '[^/]*$'
     endif
-    return matchstr(a:fsname, pat)
+    let rv = {'word': matchstr(a:fsname, pat)}
+    if isdirectory(a:fsname)
+      let rv.word = rv.word . '/'
+      let rv.menu = 'dir'
+    elseif a:fsname =~? '\.mdwn$'
+      let rv.word = fnamemodify(rv.word, ':r')
+      let rv.menu = 'page'
+    else
+      let rv.menu = 'file'
+    endif
+    return rv
   endfunction
 endif " }}}1
 
@@ -48,8 +58,6 @@ if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
     let dirs_tocheck = ikiwiki#nav#GenPosLinkLoc(expand('%:p:h').'/'
                                        \ .fnameescape(expand('%:p:t:r')))
     if strlen(baselink) == 0
-      " TODO check for .mdwn files and strip their extension
-      " TODO check for dirs and add a trailing /
       " TODO account for dir/index.mdwn
       for _path in dirs_tocheck
         call extend(completions,
@@ -65,8 +73,6 @@ if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
       if strlen(exs_dir) != strlen(_path) + strlen(baselink) + 1
         continue
       endif
-      " TODO check for .mdwn files and strip their extension
-      " TODO check for dirs and add a trailing /
       " TODO account for dir/index.mdwn
       call extend(completions,
                 \ map(split(glob(exs_dir . '/'.wk_partialpage.'*'), "\n"),
