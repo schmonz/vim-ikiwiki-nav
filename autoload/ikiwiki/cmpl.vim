@@ -51,7 +51,6 @@ if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
       " TODO check for .mdwn files and strip their extension
       " TODO check for dirs and add a trailing /
       " TODO account for dir/index.mdwn
-      call input('baselink 0')
       for _path in dirs_tocheck
         call extend(completions,
                   \ map(split(glob(_path . '/'.wk_partialpage.'*'), "\n"),
@@ -60,15 +59,11 @@ if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
       return completions
     endif
     let baselink = strpart(baselink, 0, strlen(baselink) - 1) " strip last /
-    call input('baselink '.baselink)
     for _path in dirs_tocheck
-      call input('path '._path)
       let plinkloc = ikiwiki#nav#BestLink2FName(_path, baselink.'/dummy')
       echo plinkloc
       let exs_dir = plinkloc[0][0]
-      call input('exs_dir '.exs_dir)
       if strlen(exs_dir) != strlen(_path) + strlen(baselink) + 1
-        call input('skipped')
         continue
       endif
       " TODO check for .mdwn files and strip their extension
