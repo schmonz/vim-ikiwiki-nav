@@ -175,14 +175,11 @@ if !exists("*s:BestLink2FName") " {{{1
   endfunction
 endif "}}}1
 
-" {{{1 returns all the possible subpaths existing between base_path and
-" wiki_root, as a list
+" {{{1 returns all the possible subpaths of base_path, as a list
 "
-" Example: GenPosLinkLoc('/home/a/wiki', '/home/a/wiki/dir1/dir2') would
-" return ['/home/a/wiki/dir1/dir2', '/home/a/wiki/dir1', '/home/a/wiki']
-"
-" base_path must have wiki_root as a prefix; an exception is raised otherwise
-"
+" Example: GenPosLinkLoc('/home/a/wiki/dir1/dir2') would
+" return ['/home/a/wiki/dir1/dir2', '/home/a/wiki/dir1', '/home/a/wiki',
+" '/home/a', '/home', '/']
 if !exists("*s:GenPosLinkLoc") " {{{1
   function s:GenPosLinkLoc(base_path)
     let base_path = a:base_path
