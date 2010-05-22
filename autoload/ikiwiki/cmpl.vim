@@ -23,6 +23,18 @@ if !exists("s:FindCplStart") " {{{1
   endfunction
 endif "}}}1
 
+if !exists("*s:FormatCmpl") " {{{1
+  function s:FormatCmpl(fsname, base, partialpage)
+    " TODO escape both base and partialpage to protect against alteration of the
+    " regexp
+    let pat = pat = '\c' . a:base . '/' . a:partialpage . '[^/]*$'
+    if strlen(a:base) == 0
+      let pat = '\c' . a:partialpage . '[^/]*$'
+    endif
+    return matchstr(a:fsname, pat)
+  endfunction
+endif " }}}1
+
 if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
   function ikiwiki#cmpl#IkiOmniCpl(findstart, base)
     if a:findstart == 1
@@ -40,7 +52,9 @@ if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
       " TODO account for dir/index.mdwn
       call input('baselink 0')
       for _path in dirs_tocheck
-        call extend(completions, split(glob(_path . '/'.wk_partialpage.'*'), "\n"))
+        call extend(completions,
+                  \ map(split(glob(_path . '/'.wk_partialpage.'*'), "\n"),
+                      \ 's:FormatCmpl(v:val, "'.baselink.'", "'.wk_partialpage.'")'))
       endfor
       return completions
     endif
