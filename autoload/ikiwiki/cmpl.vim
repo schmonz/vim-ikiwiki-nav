@@ -27,7 +27,7 @@ if !exists("*s:FormatCmpl") " {{{1
   function s:FormatCmpl(fsname, base, partialpage)
     " TODO escape both base and partialpage to protect against alteration of the
     " regexp
-    let pat = pat = '\c' . a:base . '/' . a:partialpage . '[^/]*$'
+    let pat = '\c' . a:base . '/' . a:partialpage . '[^/]*$'
     if strlen(a:base) == 0
       let pat = '\c' . a:partialpage . '[^/]*$'
     endif
