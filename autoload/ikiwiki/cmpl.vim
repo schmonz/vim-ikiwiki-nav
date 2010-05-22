@@ -35,6 +35,7 @@ if !exists("*s:FormatCmpl") " {{{1
   endfunction
 endif " }}}1
 
+" TODO add limits to the completion list size
 if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
   function ikiwiki#cmpl#IkiOmniCpl(findstart, base)
     if a:findstart == 1
