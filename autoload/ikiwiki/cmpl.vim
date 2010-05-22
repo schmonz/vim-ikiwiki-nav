@@ -69,7 +69,9 @@ if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
       " TODO check for .mdwn files and strip their extension
       " TODO check for dirs and add a trailing /
       " TODO account for dir/index.mdwn
-      call extend(completions, split(glob(exs_dir . '/'.wk_partialpage.'*'), "\n"))
+      call extend(completions,
+                \ map(split(glob(exs_dir . '/'.wk_partialpage.'*'), "\n"),
+                    \ 's:FormatCmpl(v:val, "'.baselink.'", "'.wk_partialpage.'")'))
     endfor
     return completions
   endfunction
