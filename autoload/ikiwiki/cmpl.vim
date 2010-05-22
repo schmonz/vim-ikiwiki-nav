@@ -61,7 +61,6 @@ if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
     let baselink = strpart(baselink, 0, strlen(baselink) - 1) " strip last /
     for _path in dirs_tocheck
       let plinkloc = ikiwiki#nav#BestLink2FName(_path, baselink.'/dummy')
-      echo plinkloc
       let exs_dir = plinkloc[0][0]
       if strlen(exs_dir) != strlen(_path) + strlen(baselink) + 1
         continue
