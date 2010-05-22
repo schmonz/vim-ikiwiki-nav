@@ -13,7 +13,7 @@
 "
 " TODO account for directives [[!, they are not links and should not be
 " autocompleted for now. We can write autocompletion for them too, though ;)
-if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
+if !exists("s:FindCplStart") " {{{1
   function s:FindCplStart()
     let li_loc = strridx(getline('.'), '[[', col('.'))
     if li_loc < 0
