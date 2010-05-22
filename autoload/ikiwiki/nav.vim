@@ -180,8 +180,8 @@ endif "}}}1
 " Example: GenPosLinkLoc('/home/a/wiki/dir1/dir2') would
 " return ['/home/a/wiki/dir1/dir2', '/home/a/wiki/dir1', '/home/a/wiki',
 " '/home/a', '/home', '/']
-if !exists("*s:GenPosLinkLoc") " {{{1
-  function s:GenPosLinkLoc(base_path)
+if !exists("*ikiwiki#nav#GenPosLinkLoc") " {{{1
+  function ikiwiki#nav#GenPosLinkLoc(base_path)
     let base_path = a:base_path
     let pos_locs = []
     while base_path != ''
@@ -208,9 +208,9 @@ if !exists("*ikiwiki#nav#GoToWikiPage") " {{{1
     endif
     if wl_text =~ '^/'
       let wl_text = strpart(wl_text, 1)
-      let dirs_tocheck = reverse(s:GenPosLinkLoc(expand('%:p:h')))
+      let dirs_tocheck = reverse(ikiwiki#nav#GenPosLinkLoc(expand('%:p:h')))
     else
-      let dirs_tocheck = s:GenPosLinkLoc(expand('%:p:h').'/'
+      let dirs_tocheck = ikiwiki#nav#GenPosLinkLoc(expand('%:p:h').'/'
                                        \ .fnameescape(expand('%:p:t:r')))
     endif
     for _path in dirs_tocheck
