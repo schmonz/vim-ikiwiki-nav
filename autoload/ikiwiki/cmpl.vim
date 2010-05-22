@@ -28,7 +28,24 @@ if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
     if a:findstart == 1
       return s:FindCplStart()
     endif
-    return [a:base."bomba", a:base."pato", a:base."mama"]
+    let mrl = matchlist(base, '^\(\([^/]*/\)*\)\([^/]*\)$')
+    let baselink = mrl[1]
+    let wk_partialpage = mr[3]
+    let dirs_tocheck = ikiwiki#nav#GenPosLinkLoc(expand('%:p:h').'/'
+                                       \ .fnameescape(expand('%:p:t:r')))
+    if strlen(baselink) > 0
+      let baselink = strpart(baselink, 0, strlen(baselink) - 1) " strip last /
+      for _path in dirs_tocheck
+        let plinkloc = s:BestLink2FName(_path, baselink)
+        let exs_dir = plinkloc[0][0]
+        if strlen(exs_dir) != strlen(_path) + strlen(baselink) + 1
+          continue
+        endif
+        " check if path+baselink/wk_partialpage* exists
+        " if it does, add it to the completion list
+      endfor
+    endif
+    return [a:base."foo", a:base."bar", a:base."baz"]
   endfunction
 endif "}}}1
 
