@@ -4,6 +4,12 @@
 "
 " in other words, from which position should the omni-completion be allowed to
 " modify the current line
+"
+" TODO account for the following:
+"
+" asdfasd af [[adfads]] adfads 
+"                         ^
+" it should NOT do the completion, but as of now it does
 if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
   function s:FindCplStart()
     let li_loc = strridx(getline('.'), '[[', col('.'))
