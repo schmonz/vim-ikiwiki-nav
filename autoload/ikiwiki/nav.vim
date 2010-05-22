@@ -113,8 +113,8 @@ endif "}}}1
 "
 " BestLink2FName('/home/user/wiki', 'dir1/otherdir/MyPage') will return
 " [['/home/user/wiki/dir1/', 'otherdir', 'MyPage.mdwn'], ['/home/user/wiki/dir1/', 'otherdir/MyPage', 'index.mdwn']] 
-if !exists("*s:BestLink2FName") " {{{1
-  function s:BestLink2FName(real_path, link_text)
+if !exists("*ikiwiki#nav#BestLink2FName") " {{{1
+  function ikiwiki#nav#BestLink2FName(real_path, link_text)
     let link_text = a:link_text
     let existent_path = a:real_path
     if match(link_text, '^/\|/$\|^$') >= 0
@@ -214,7 +214,7 @@ if !exists("*ikiwiki#nav#GoToWikiPage") " {{{1
                                        \ .fnameescape(expand('%:p:t:r')))
     endif
     for _path in dirs_tocheck
-      let plinkloc = s:BestLink2FName(_path, wl_text)
+      let plinkloc = ikiwiki#nav#BestLink2FName(_path, wl_text)
       let stdlinkform = plinkloc[0] " (dirs)/page.mdwn
       if strlen(stdlinkform[1]) == 0 && strlen(stdlinkform[2]) == 0
         " yay, the file exists
