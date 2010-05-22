@@ -10,6 +10,9 @@
 " asdfasd af [[adfads]] adfads 
 "                         ^
 " it should NOT do the completion, but as of now it does
+"
+" TODO account for directives [[!, they are not links and should not be
+" autocompleted for now. We can write autocompletion for them too, though ;)
 if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
   function s:FindCplStart()
     let li_loc = strridx(getline('.'), '[[', col('.'))
