@@ -16,6 +16,8 @@
 " it should NOT do the completion, but as of now it tries, by passing in the
 " second call the base text 'adfads]] adf' (for this example)
 "
+" TODO account for [[link name|link_url]]
+"
 "}}}1
 if !exists("s:FindCplStart") " {{{1
   function s:FindCplStart()
