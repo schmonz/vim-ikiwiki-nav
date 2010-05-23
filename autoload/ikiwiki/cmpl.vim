@@ -1,28 +1,77 @@
 " vim: fdm=marker
 
-" find the initial point of the completion
+
+" TODO see how does ikiwiki handle spaces in links, to define the policy to
+" handle them here
+
+"{{{1 find the initial point of the completion
 "
-" in other words, from which position should the omni-completion be allowed to
+" in other words, the position from which the omni-completion is allowed to
 " modify the current line
 "
 " TODO account for the following:
 "
 " asdfasd af [[adfads]] adfads 
 "                         ^
-" it should NOT do the completion, but as of now it does
+" it should NOT do the completion, but as of now it tries, by passing in the
+" second call the base text 'adfads]] adf' (for this example)
 "
-" TODO account for directives [[!, they are not links and should not be
-" autocompleted for now. We can write autocompletion for them too, though ;)
+"}}}1
 if !exists("s:FindCplStart") " {{{1
   function s:FindCplStart()
-    let li_loc = strridx(getline('.'), '[[', col('.'))
+    let link_str = '[['
+    let dir_str = '[[!'
+    let li_loc = strridx(getline('.'), link_str, col('.'))
     if li_loc < 0
       return -1
     endif
-    return li_loc + 2
+    let di_loc = strridx(getline('.'), dir_str, col('.'))
+    if di_loc == li_loc
+      return -1
+    endif
+    return li_loc + strlen(link_str)
   endfunction
 endif "}}}1
 
+
+if !exists("*s:IntersectPaths") " {{{1
+  function s:IntersectPaths(p1, p2)
+    let i = 0
+    while a:p1[i] == a:p2[i]
+      let i = i + 1
+    endwhile
+    return strpart(a:p1, 0, i)
+  endfunction
+endif "}}}1
+
+" calculate for how many folders two given paths differ
+if !exists("*s:DirsDistance") " {{{1
+  function s:DirsDistance(d1, d2)
+    let d1 = substitute(fnameescape(a:d1), '/\+', '/', 'g')
+    let d2 = substitute(fnameescape(a:d2), '/\+', '/', 'g')
+    if strlen(d1) < strlen(d2)
+      let tmp = d2
+      let d2 = d1
+      let d1 = tmp
+    endif
+    let dirs_left = substitute(d1, '^'.d2, '', '')
+    return len(split(dirs_left, '/'))
+  endfunction
+endif "}}}1
+
+" {{{1 format a filename with its full path for proper presentation in the
+" omnicomp menu
+" 
+" all the leading path components up to, and not including base/partialpage*$
+" are removed from the filename string
+"
+" Besides of that:
+"
+"   * if the filename is a ikiwiki page (.mdwn) its extension is stripped
+"   * if the filename is a directory, a '/' is added
+"   * otherwise, it is left untouched
+"
+" }}}1
 if !exists("*s:FormatCmpl") " {{{1
   function s:FormatCmpl(fsname, base, partialpage)
     let base = fnameescape(a:base)
@@ -41,6 +90,9 @@ if !exists("*s:FormatCmpl") " {{{1
     else
       let rv.menu = 'file'
     endif
+    let bufpath = expand('%:p')
+    let dirdist = s:DirsDistance(s:IntersectPaths(bufpath, a:fsname), bufpath)
+    let rv.menu = string(dirdist) ."-". rv.menu
     return rv
   endfunction
 endif " }}}1
