@@ -11,7 +11,7 @@
 "
 " TODO account for the following:
 "
-" asdfasd af [[adfads]] adfads 
+" asdfasd af [[adfads]] adfads
 "                         ^
 " it should NOT do the completion, but as of now it tries, by passing in the
 " second call the base text 'adfads]] adf' (for this example)
@@ -62,7 +62,7 @@ endif "}}}1
 
 " {{{1 format a filename with its full path for proper presentation in the
 " omnicomp menu
-" 
+"
 " all the leading path components up to, and not including base/partialpage*$
 " are removed from the filename string
 "
@@ -84,7 +84,7 @@ if !exists("*s:FormatCmpl") " {{{1
     let rv = {'word': matchstr(a:fsname, pat)}
     if isdirectory(a:fsname)
       let rv.word = rv.word . '/'
-      let rv.menu = 'dir'
+      let rv.menu = 'dir '
     elseif a:fsname =~? '\.mdwn$'
       let rv.word = fnamemodify(rv.word, ':r')
       let rv.menu = 'page'
@@ -93,7 +93,7 @@ if !exists("*s:FormatCmpl") " {{{1
     endif
     let bufpath = expand('%:p')
     let dirdist = s:DirsDistance(s:IntersectPaths(bufpath, a:fsname), bufpath)
-    let rv.menu = string(dirdist) ."-". rv.menu
+    let rv.menu = string(dirdist) ."-". rv.menu . " " . pathshorten(a:fsname)
     return rv
   endfunction
 endif " }}}1
