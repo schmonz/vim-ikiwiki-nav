@@ -86,6 +86,7 @@ if !exists("*s:FormatCmpl") " {{{1
       let rv.word = rv.word . '/'
       let rv.menu = 'dir '
     elseif a:fsname =~? '\.mdwn$'
+      " TODO once s:AddIdxLinks is written, account here for the index.mdwn case
       let rv.word = fnamemodify(rv.word, ':r')
       let rv.menu = 'page'
     else
@@ -97,6 +98,18 @@ if !exists("*s:FormatCmpl") " {{{1
     let dirdist = s:DirsDistance(common_dir, bufdir) + s:DirsDistance(common_dir, cmpldir)
     let rv.menu = string(dirdist) ."-". rv.menu . " " . pathshorten(a:fsname)
     return rv
+  endfunction
+endif " }}}1
+
+
+" {{{1 checks a list of files, and adds <pathname>/index.mdwn
+" Intended to check which items of a given list are directories, and which of
+" them contain a 'index.mdwn' file, to add those to the received list
+" }}}1
+if !exists("*s:AddIdxLinks") " {{{1
+  function s:AddIdxLinks(path_list)
+    " TODO WRITE ME!
+    return a:path_list
   endfunction
 endif " }}}1
 
@@ -116,8 +129,8 @@ if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
       " TODO account for dir/index.mdwn
       for _path in dirs_tocheck
         call extend(completions,
-                  \ map(split(glob(_path . '/'.wk_partialpage.'*'), "\n"),
-                      \ 's:FormatCmpl(v:val, "'.baselink.'", "'.wk_partialpage.'")'))
+                  \ map(s:AddIdxLinks(split(glob(_path . '/'.wk_partialpage.'*'), "\n")),
+                      \ 's:FormatCmpl(v:val, baselink, wk_partialpage)'))
       endfor
       return completions
     endif
@@ -130,8 +143,8 @@ if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
       endif
       " TODO account for dir/index.mdwn
       call extend(completions,
-                \ map(split(glob(exs_dir . '/'.wk_partialpage.'*'), "\n"),
-                    \ 's:FormatCmpl(v:val, "'.baselink.'", "'.wk_partialpage.'")'))
+                \ map(s:AddIdxLinks(split(glob(exs_dir . '/'.wk_partialpage.'*'), "\n")),
+                    \ 's:FormatCmpl(v:val, baselink, wk_partialpage)'))
     endfor
     return completions
   endfunction
