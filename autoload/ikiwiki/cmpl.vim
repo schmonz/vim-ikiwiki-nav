@@ -37,7 +37,8 @@ endif "}}}1
 if !exists("*s:IntersectPaths") " {{{1
   function s:IntersectPaths(p1, p2)
     let i = 0
-    while a:p1[i] == a:p2[i]
+    let maxlen = min([strlen(a:p1), strlen(a:p2)])
+    while i < maxlen && a:p1[i] == a:p2[i]
       let i = i + 1
     endwhile
     return strpart(a:p1, 0, i)
