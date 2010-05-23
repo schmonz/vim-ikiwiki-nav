@@ -91,8 +91,10 @@ if !exists("*s:FormatCmpl") " {{{1
     else
       let rv.menu = 'file'
     endif
-    let bufpath = expand('%:p')
-    let dirdist = s:DirsDistance(s:IntersectPaths(bufpath, a:fsname), bufpath)
+    let bufdir = expand('%:p:h')
+    let cmpldir = fnamemodify(a:fsname, ':h')
+    let common_dir = s:IntersectPaths(bufdir, cmpldir)
+    let dirdist = s:DirsDistance(common_dir, bufdir) + s:DirsDistance(common_dir, cmpldir)
     let rv.menu = string(dirdist) ."-". rv.menu . " " . pathshorten(a:fsname)
     return rv
   endfunction
