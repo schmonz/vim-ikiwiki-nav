@@ -149,7 +149,6 @@ if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
     let dirs_tocheck = ikiwiki#nav#GenPosLinkLoc(expand('%:p:h').'/'
                                        \ .fnameescape(expand('%:p:t:r')))
     if strlen(baselink) == 0
-      " TODO account for dir/index.mdwn
       for _path in dirs_tocheck
         call extend(completions,
                   \ map(s:AddIdxLinks(split(glob(_path . '/'.wk_partialpage.'*'), "\n")),
@@ -164,7 +163,6 @@ if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
       if strlen(exs_dir) != strlen(_path) + strlen(baselink) + 1
         continue
       endif
-      " TODO account for dir/index.mdwn
       call extend(completions,
                 \ map(s:AddIdxLinks(split(glob(exs_dir . '/'.wk_partialpage.'*'), "\n")),
                     \ 's:FormatCmpl(v:val, baselink, wk_partialpage)'))
