@@ -93,7 +93,7 @@ if !exists("*s:FormatCmpl") " {{{1
     " partialpage matching. see how to handle
     "
     " see also how to avoid duplicates. e.g., if we offered a link to
-    " personal, based on the personal/index.mdwn, once we are in personal/, we
+    " personal, based on the personal/index.mdwn file, once we are in personal/, we
     " can't offer personal nor index as completion options
     let rv = {'word': matchstr(a:fsname, pat)}
     if isdirectory(a:fsname)
