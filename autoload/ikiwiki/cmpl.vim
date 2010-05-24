@@ -88,12 +88,18 @@ if !exists("*s:FormatCmpl") " {{{1
     if strlen(base) == 0
       let pat = '\c' . partialpage . '[^/]*$'
     endif
+    " TODO index.mdwn case
+    " this match is killing all the page/index.mdwn pages, because of the
+    " partialpage matching. see how to handle
+    "
+    " see also how to avoid duplicates. e.g., if we offered a link to
+    " personal, based on the personal/index.mdwn, once we are in personal/, we
+    " can't offer personal nor index as completion options
     let rv = {'word': matchstr(a:fsname, pat)}
     if isdirectory(a:fsname)
       let rv.word = rv.word . '/'
       let rv.menu = 'dir '
     elseif a:fsname =~? '\.mdwn$'
-      " TODO once s:AddIdxLinks is written, account here for the index.mdwn case
       let rv.word = fnamemodify(rv.word, ':r')
       let rv.menu = 'page'
     else
