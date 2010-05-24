@@ -18,6 +18,11 @@
 "
 " TODO account for [[link name|link_url]]
 "
+" TODO account for multiline links
+"
+" TODO unify the link search with the navigation part; both of them use the link
+" extraction functionality
+"
 "}}}1
 if !exists("s:FindCplStart") " {{{1
   function s:FindCplStart()
