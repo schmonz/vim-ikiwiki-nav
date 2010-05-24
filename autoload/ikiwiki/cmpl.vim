@@ -110,8 +110,18 @@ endif " }}}1
 " }}}1
 if !exists("*s:AddIdxLinks") " {{{1
   function s:AddIdxLinks(path_list)
-    " TODO WRITE ME!
-    return a:path_list
+    let scratch = copy(a:path_list)
+    let path_list = copy(a:path_list)
+    for path in filter(scratch, 'isdirectory(v:val)')
+      let path_pr = fnamemodify(path, ':h')
+      let path_pag = fnamemodify(path, ':t')
+      let pospage = ikiwiki#nav#BestLink2FName(path_pr, path_pag)
+      if len(pospage) == 1 && strlen(pospage[0][1]) == 0 && strlen(pospage[0][2]) == 0
+       \ && pospage[0][0] =~? 'index\.mdwn$'
+        call add(path_list, pospage[0][0])
+      endif
+    endfor
+    return path_list
   endfunction
 endif " }}}1
 
