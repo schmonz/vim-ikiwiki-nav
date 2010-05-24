@@ -90,8 +90,9 @@ endif "}}}1
 " existing path, the path that needs to be created, and the filename
 " corresponding to the wiki link
 "
-" when the file exists, its path is in the first position of the tuple, and
-" the second and third positions are empty
+" when the file exists, its path is in the first position of the first tuple,
+" and the second and third positions are empty. The function only returns one
+" tuple in this case
 "
 " it checks for the existence of a normal page ((dirs)/page.mdwn) and for the
 " alternate form of a page ((dirs)/page/index.mdwn), hence the one-or-two
