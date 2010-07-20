@@ -188,13 +188,11 @@ if !exists("*ikiwiki#nav#GenPosLinkLoc") " {{{1
   function ikiwiki#nav#GenPosLinkLoc(base_path)
     let base_path = a:base_path
     let pos_locs = []
-    while base_path != ''
+    call add(pos_locs, base_path)
+    while base_path != '/'
+      let base_path = fnamemodify(base_path, ':h')
       call add(pos_locs, base_path)
-
-      " remove rightmost path element, including its /
-      let base_path = substitute(base_path, '/\?[^/]\+$', '', '')
     endwhile
-    call add(pos_locs, '/')
     return pos_locs
   endfunction
 endif " }}}1

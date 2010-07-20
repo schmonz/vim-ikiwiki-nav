@@ -1,4 +1,5 @@
-  * replace all the hand-made path manipulation, with the fnamemodify function
+  * Handle properly the anchors. For now just ignore them, in the future maybe
+    look for the anchor location and jump there.
   * Add docs in vim format
   * Recognize multiline wikilinks
   * support for wintendo
