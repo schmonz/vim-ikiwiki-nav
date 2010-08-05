@@ -54,32 +54,30 @@ let s:wl_pat = '\v\[\[[^\!\]][^\[\]]*\]\]'
 " Problems:
 " This doesn't work over multiline wikilinks, like [[hi
 " there|hi_there]]
-if !exists("*s:WikiLinkText") " {{{1
-  function s:WikiLinkText()
-    let start = 0
-    let cpos = col(".") - 1
-    let wl_ftext = ''
-    while 1
-      let left_i = match(getline("."), s:wl_pat, start)
-      if left_i < 0
-        return ''
-      endif
-      if left_i > cpos
-        return ''
-      endif 
-      let right_i = matchend(getline("."), s:wl_pat, start)
-      if cpos < right_i
-        let wl_ftext = matchstr(getline("."), s:wl_pat, start)
-        break
-      endif
-      let start = right_i
-    endwhile
-    if match(wl_ftext, '|') >= 0
-      return matchlist(wl_ftext, '\v(\[)*[^\[\| ]*\|([^\] ]+)(\])*')[2]
+function! s:WikiLinkText() " {{{1
+  let start = 0
+  let cpos = col(".") - 1
+  let wl_ftext = ''
+  while 1
+    let left_i = match(getline("."), s:wl_pat, start)
+    if left_i < 0
+      return ''
     endif
-    return matchlist(wl_ftext, '\v(\[)*([^\[\] ]+)(\])*')[2]
-  endfunction
-endif "}}}1
+    if left_i > cpos
+      return ''
+    endif 
+    let right_i = matchend(getline("."), s:wl_pat, start)
+    if cpos < right_i
+      let wl_ftext = matchstr(getline("."), s:wl_pat, start)
+      break
+    endif
+    let start = right_i
+  endwhile
+  if match(wl_ftext, '|') >= 0
+    return matchlist(wl_ftext, '\v(\[)*[^\[\| ]*\|([^\] ]+)(\])*')[2]
+  endif
+  return matchlist(wl_ftext, '\v(\[)*([^\[\] ]+)(\])*')[2]
+endfunction " }}}1
 
 " {{{1 searches for the best conversion of link_text to a path in the
 " filesystem, given the path 'real_path' as a prefix, and checking all the
@@ -117,122 +115,116 @@ endif "}}}1
 "
 " TODO FIXME XXX this thing is not checking for non-existent directories
 " properly
-if !exists("*ikiwiki#nav#BestLink2FName") " {{{1
-  function ikiwiki#nav#BestLink2FName(real_path, link_text)
-    let link_text = a:link_text
-    let existent_path = a:real_path
-    if match(link_text, '^/\|/$\|^$') >= 0
-      throw 'IWNAV:INVALID_LINK('.link_text
-          \ .'): has a leading or trailing /, or is empty'
-    endif
-    let page_name = matchstr(link_text, '[^/]\+$')
-    let page_fname = fnameescape(page_name.'.mdwn')
-    let page_dname = fnameescape(page_name)
-    let dirs = substitute(link_text, '/\?'.page_name.'$', '', '')
-    " check the existence of all the dirs (parents of) of the page
-    while dirs != ''
-      let cdir = matchstr(dirs, '^[^/]\+')
+function! ikiwiki#nav#BestLink2FName(real_path, link_text) " {{{1
+  let link_text = a:link_text
+  let existent_path = a:real_path
+  if match(link_text, '^/\|/$\|^$') >= 0
+    throw 'IWNAV:INVALID_LINK('.link_text
+        \ .'): has a leading or trailing /, or is empty'
+  endif
+  let page_name = matchstr(link_text, '[^/]\+$')
+  let page_fname = fnameescape(page_name.'.mdwn')
+  let page_dname = fnameescape(page_name)
+  let dirs = substitute(link_text, '/\?'.page_name.'$', '', '')
+  " check the existence of all the dirs (parents of) of the page
+  while dirs != ''
+    let cdir = matchstr(dirs, '^[^/]\+')
 
-      let poss_files = split(glob(existent_path . '/*'), "\n")
-      let matches = filter(poss_files,
-                         \ 'v:val ==? "'.existent_path.'/'.fnameescape(cdir).'"')
-      if len(matches) == 0
-        return [[existent_path, dirs, page_fname],
-              \ [existent_path, dirs.'/'.page_dname, 'index.mdwn']]
-      endif
-
-      let existent_path = matches[0]
-      let dirs = substitute(dirs, '^'.cdir.'/\?', '', '')
-    endwhile
-
-    " check existence of (dirs)/page.mdwn
     let poss_files = split(glob(existent_path . '/*'), "\n")
     let matches = filter(poss_files,
-                       \ 'v:val ==? "'.existent_path.'/'.page_fname.'"')
+                       \ 'v:val ==? "'.existent_path.'/'.fnameescape(cdir).'"')
+    if len(matches) == 0
+      return [[existent_path, dirs, page_fname],
+            \ [existent_path, dirs.'/'.page_dname, 'index.mdwn']]
+    endif
+
+    let existent_path = matches[0]
+    let dirs = substitute(dirs, '^'.cdir.'/\?', '', '')
+  endwhile
+
+  " check existence of (dirs)/page.mdwn
+  let poss_files = split(glob(existent_path . '/*'), "\n")
+  let matches = filter(poss_files,
+                     \ 'v:val ==? "'.existent_path.'/'.page_fname.'"')
+  if len(matches) > 0
+    return [[matches[0], '', '']]
+  endif
+
+  " check existence of (dirs)/page/index.mdwn
+  " 
+  let poss_files = split(glob(existent_path . '/*'), "\n")
+  let matches = filter(poss_files,
+                     \ 'v:val ==? "'.existent_path.'/'.page_dname.'"')
+  if len(matches) > 0
+    let existent_path = matches[0]
+    let poss_files = split(glob(existent_path . '/*'), "\n")
+    let matches = filter(poss_files,
+                       \ 'v:val ==? "'.existent_path.'/index.mdwn"')
     if len(matches) > 0
       return [[matches[0], '', '']]
-    endif
+    else
+      " page_dname exists, but page_dname/index.mdwn doesn't. WTF is wrong
+      " with you?!
 
-    " check existence of (dirs)/page/index.mdwn
-    " 
-    let poss_files = split(glob(existent_path . '/*'), "\n")
-    let matches = filter(poss_files,
-                       \ 'v:val ==? "'.existent_path.'/'.page_dname.'"')
-    if len(matches) > 0
-      let existent_path = matches[0]
-      let poss_files = split(glob(existent_path . '/*'), "\n")
-      let matches = filter(poss_files,
-                         \ 'v:val ==? "'.existent_path.'/index.mdwn"')
-      if len(matches) > 0
-        return [[matches[0], '', '']]
-      else
-        " page_dname exists, but page_dname/index.mdwn doesn't. WTF is wrong
-        " with you?!
-
-        return [[existent_path, '', page_fname],
-              \ [existent_path, '', 'index.mdwn']]
-      endif
+      return [[existent_path, '', page_fname],
+            \ [existent_path, '', 'index.mdwn']]
     endif
-    " nothing exists, return both possible locations
-    return [[existent_path, '', page_fname],
-          \ [existent_path, page_dname, 'index.mdwn']]
-  endfunction
-endif "}}}1
+  endif
+  " nothing exists, return both possible locations
+  return [[existent_path, '', page_fname],
+        \ [existent_path, page_dname, 'index.mdwn']]
+endfunction " }}}1
 
 " {{{1 returns all the possible subpaths of base_path, as a list
 "
 " Example: GenPosLinkLoc('/home/a/wiki/dir1/dir2') would
 " return ['/home/a/wiki/dir1/dir2', '/home/a/wiki/dir1', '/home/a/wiki',
 " '/home/a', '/home', '/']
-if !exists("*ikiwiki#nav#GenPosLinkLoc") " {{{1
-  function ikiwiki#nav#GenPosLinkLoc(base_path)
-    let base_path = a:base_path
-    let pos_locs = []
+function! ikiwiki#nav#GenPosLinkLoc(base_path) " {{{1
+  let base_path = a:base_path
+  let pos_locs = []
+  call add(pos_locs, base_path)
+  while base_path != '/'
+    let base_path = fnamemodify(base_path, ':h')
     call add(pos_locs, base_path)
-    while base_path != '/'
-      let base_path = fnamemodify(base_path, ':h')
-      call add(pos_locs, base_path)
-    endwhile
-    return pos_locs
-  endfunction
-endif " }}}1
+  endwhile
+  return pos_locs
+endfunction " }}}1
 
 " {{{1 Opens the file associated with the WikiLink currently under the cursor
 "
 " If no file can be found, prints a messages, and does nothing
 "
-if !exists("*ikiwiki#nav#GoToWikiPage") " {{{1
-  function ikiwiki#nav#GoToWikiPage()
-    let wl_text = s:WikiLinkText()
-    if wl_text == ''
-      echo "No wikilink found under the cursor"
+function! ikiwiki#nav#GoToWikiPage() " {{{1
+  let wl_text = s:WikiLinkText()
+  if wl_text == ''
+    echo "No wikilink found under the cursor"
+    return
+  endif
+  if wl_text =~ '^/'
+    let wl_text = strpart(wl_text, 1)
+    let dirs_tocheck = reverse(ikiwiki#nav#GenPosLinkLoc(expand('%:p:h')))
+  else
+    let dirs_tocheck = ikiwiki#nav#GenPosLinkLoc(expand('%:p:h').'/'
+                                     \ .fnameescape(expand('%:p:t:r')))
+  endif
+  for _path in dirs_tocheck
+    let plinkloc = ikiwiki#nav#BestLink2FName(_path, wl_text)
+    let stdlinkform = plinkloc[0] " (dirs)/page.mdwn
+    if strlen(stdlinkform[1]) == 0 && strlen(stdlinkform[2]) == 0
+      " yay, the file exists
+      exec 'e ' .stdlinkform[0]
       return
     endif
-    if wl_text =~ '^/'
-      let wl_text = strpart(wl_text, 1)
-      let dirs_tocheck = reverse(ikiwiki#nav#GenPosLinkLoc(expand('%:p:h')))
-    else
-      let dirs_tocheck = ikiwiki#nav#GenPosLinkLoc(expand('%:p:h').'/'
-                                       \ .fnameescape(expand('%:p:t:r')))
+    let altlinkform = plinkloc[0] " (dirs)/page/index.mdwn
+    if strlen(altlinkform[1]) == 0 && strlen(altlinkform[2]) == 0
+      " yay, the file exists
+      exec 'e '.altlinkform[0]
+      return
     endif
-    for _path in dirs_tocheck
-      let plinkloc = ikiwiki#nav#BestLink2FName(_path, wl_text)
-      let stdlinkform = plinkloc[0] " (dirs)/page.mdwn
-      if strlen(stdlinkform[1]) == 0 && strlen(stdlinkform[2]) == 0
-        " yay, the file exists
-        exec 'e ' .stdlinkform[0]
-        return
-      endif
-      let altlinkform = plinkloc[0] " (dirs)/page/index.mdwn
-      if strlen(altlinkform[1]) == 0 && strlen(altlinkform[2]) == 0
-        " yay, the file exists
-        exec 'e '.altlinkform[0]
-        return
-      endif
-    endfor
-    echo "File does not exist - '".wl_text."'"
-  endfunction
-endif " }}}1
+  endfor
+  echo "File does not exist - '".wl_text."'"
+endfunction " }}}1
 
 " {{{1 Moves the cursor to the nearest WikiLink in the buffer
 "
@@ -244,14 +236,12 @@ endif " }}}1
 "     backwards == 0: look forward
 "     backwards == 1: look backwards (surprise!)
 "
-if !exists("*ikiwiki#nav#NextWikiLink") " {{{1
-  function ikiwiki#nav#NextWikiLink(backwards)
-    let flags = 'W'
-    if (a:backwards)
-      let flags = flags . 'b'
-    endif
-    call search(s:wl_pat, flags)
-  endfunction
-endif " }}}1
+function! ikiwiki#nav#NextWikiLink(backwards) " {{{1
+  let flags = 'W'
+  if (a:backwards)
+    let flags = flags . 'b'
+  endif
+  call search(s:wl_pat, flags)
+endfunction " }}}1
 
 
