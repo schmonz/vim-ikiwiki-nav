@@ -24,48 +24,42 @@
 " extraction functionality
 "
 "}}}1
-if !exists("s:FindCplStart") " {{{1
-  function s:FindCplStart()
-    let link_str = '[['
-    let dir_str = '[[!'
-    let li_loc = strridx(getline('.'), link_str, col('.'))
-    if li_loc < 0
-      return -1
-    endif
-    let di_loc = strridx(getline('.'), dir_str, col('.'))
-    if di_loc == li_loc
-      return -1
-    endif
-    return li_loc + strlen(link_str)
-  endfunction
-endif "}}}1
+function! s:FindCplStart() " {{{1
+  let link_str = '[['
+  let dir_str = '[[!'
+  let li_loc = strridx(getline('.'), link_str, col('.'))
+  if li_loc < 0
+    return -1
+  endif
+  let di_loc = strridx(getline('.'), dir_str, col('.'))
+  if di_loc == li_loc
+    return -1
+  endif
+  return li_loc + strlen(link_str)
+endfunction " }}}1
 
 
-if !exists("*s:IntersectPaths") " {{{1
-  function s:IntersectPaths(p1, p2)
-    let i = 0
-    let maxlen = min([strlen(a:p1), strlen(a:p2)])
-    while i < maxlen && a:p1[i] == a:p2[i]
-      let i = i + 1
-    endwhile
-    return strpart(a:p1, 0, i)
-  endfunction
-endif "}}}1
+function! s:IntersectPaths(p1, p2) " {{{1
+  let i = 0
+  let maxlen = min([strlen(a:p1), strlen(a:p2)])
+  while i < maxlen && a:p1[i] == a:p2[i]
+    let i = i + 1
+  endwhile
+  return strpart(a:p1, 0, i)
+endfunction " }}}1
 
 " calculate for how many folders two given paths differ
-if !exists("*s:DirsDistance") " {{{1
-  function s:DirsDistance(d1, d2)
-    let d1 = substitute(fnameescape(a:d1), '/\+', '/', 'g')
-    let d2 = substitute(fnameescape(a:d2), '/\+', '/', 'g')
-    if strlen(d1) < strlen(d2)
-      let tmp = d2
-      let d2 = d1
-      let d1 = tmp
-    endif
-    let dirs_left = substitute(d1, '^'.d2, '', '')
-    return len(split(dirs_left, '/'))
-  endfunction
-endif "}}}1
+function! s:DirsDistance(d1, d2) " {{{1
+  let d1 = substitute(fnameescape(a:d1), '/\+', '/', 'g')
+  let d2 = substitute(fnameescape(a:d2), '/\+', '/', 'g')
+  if strlen(d1) < strlen(d2)
+    let tmp = d2
+    let d2 = d1
+    let d1 = tmp
+  endif
+  let dirs_left = substitute(d1, '^'.d2, '', '')
+  return len(split(dirs_left, '/'))
+endfunction " }}}1
 
 " {{{1 format a filename with its full path for proper presentation in the
 " omnicomp menu
@@ -80,94 +74,88 @@ endif "}}}1
 "   * otherwise, it is left untouched
 "
 " }}}1
-if !exists("*s:FormatCmpl") " {{{1
-  function s:FormatCmpl(fsname, base, partialpage)
-    let base = fnameescape(a:base)
-    let partialpage = fnameescape(a:partialpage)
-    let pat = '\c' . base . '/' . partialpage . '[^/]*$'
-    if strlen(base) == 0
-      let pat = '\c' . partialpage . '[^/]*$'
-    endif
-    " TODO index.mdwn case
-    " this match is killing all the page/index.mdwn pages, because of the
-    " partialpage matching. see how to handle
-    "
-    " see also how to avoid duplicates. e.g., if we offered a link to
-    " personal, based on the personal/index.mdwn file, once we are in personal/, we
-    " can't offer personal nor index as completion options
-    let rv = {'word': matchstr(a:fsname, pat)}
-    if isdirectory(a:fsname)
-      let rv.word = rv.word . '/'
-      let rv.menu = 'dir '
-    elseif a:fsname =~? '\.mdwn$'
-      let rv.word = fnamemodify(rv.word, ':r')
-      let rv.menu = 'page'
-    else
-      let rv.menu = 'file'
-    endif
-    let bufdir = expand('%:p:h')
-    let cmpldir = fnamemodify(a:fsname, ':h')
-    let common_dir = s:IntersectPaths(bufdir, cmpldir)
-    let dirdist = s:DirsDistance(common_dir, bufdir) + s:DirsDistance(common_dir, cmpldir)
-    let rv.menu = string(dirdist) ."-". rv.menu . " " . pathshorten(a:fsname)
-    return rv
-  endfunction
-endif " }}}1
+function! s:FormatCmpl(fsname, base, partialpage) " {{{1
+  let base = fnameescape(a:base)
+  let partialpage = fnameescape(a:partialpage)
+  let pat = '\c' . base . '/' . partialpage . '[^/]*$'
+  if strlen(base) == 0
+    let pat = '\c' . partialpage . '[^/]*$'
+  endif
+  " TODO index.mdwn case
+  " this match is killing all the page/index.mdwn pages, because of the
+  " partialpage matching. see how to handle
+  "
+  " see also how to avoid duplicates. e.g., if we offered a link to
+  " personal, based on the personal/index.mdwn file, once we are in personal/, we
+  " can't offer personal nor index as completion options
+  let rv = {'word': matchstr(a:fsname, pat)}
+  if isdirectory(a:fsname)
+    let rv.word = rv.word . '/'
+    let rv.menu = 'dir '
+  elseif a:fsname =~? '\.mdwn$'
+    let rv.word = fnamemodify(rv.word, ':r')
+    let rv.menu = 'page'
+  else
+    let rv.menu = 'file'
+  endif
+  let bufdir = expand('%:p:h')
+  let cmpldir = fnamemodify(a:fsname, ':h')
+  let common_dir = s:IntersectPaths(bufdir, cmpldir)
+  let dirdist = s:DirsDistance(common_dir, bufdir) + s:DirsDistance(common_dir, cmpldir)
+  let rv.menu = string(dirdist) ."-". rv.menu . " " . pathshorten(a:fsname)
+  return rv
+endfunction " }}}1
 
 
 " {{{1 checks a list of files, and adds <pathname>/index.mdwn
 " Intended to check which items of a given list are directories, and which of
 " them contain a 'index.mdwn' file, to add those to the received list
 " }}}1
-if !exists("*s:AddIdxLinks") " {{{1
-  function s:AddIdxLinks(path_list)
-    let scratch = copy(a:path_list)
-    let path_list = copy(a:path_list)
-    for path in filter(scratch, 'isdirectory(v:val)')
-      let path_pr = fnamemodify(path, ':h')
-      let path_pag = fnamemodify(path, ':t')
-      let pospage = ikiwiki#nav#BestLink2FName(path_pr, path_pag)
-      if len(pospage) == 1 && strlen(pospage[0][1]) == 0 && strlen(pospage[0][2]) == 0
-       \ && pospage[0][0] =~? 'index\.mdwn$'
-        call add(path_list, pospage[0][0])
-      endif
-    endfor
-    return path_list
-  endfunction
-endif " }}}1
+function! s:AddIdxLinks(path_list) " {{{1
+  let scratch = copy(a:path_list)
+  let path_list = copy(a:path_list)
+  for path in filter(scratch, 'isdirectory(v:val)')
+    let path_pr = fnamemodify(path, ':h')
+    let path_pag = fnamemodify(path, ':t')
+    let pospage = ikiwiki#nav#BestLink2FName(path_pr, path_pag)
+    if len(pospage) == 1 && strlen(pospage[0][1]) == 0 && strlen(pospage[0][2]) == 0
+     \ && pospage[0][0] =~? 'index\.mdwn$'
+      call add(path_list, pospage[0][0])
+    endif
+  endfor
+  return path_list
+endfunction " }}}1
 
 " TODO add limits to the completion list size
-if !exists("*ikiwiki#cmpl#IkiOmniCpl") " {{{1
-  function ikiwiki#cmpl#IkiOmniCpl(findstart, base)
-    if a:findstart == 1
-      return s:FindCplStart()
-    endif
-    let completions = []
-    let mrl = matchlist(a:base, '^\(\([^/]*/\)*\)\([^/]*\)$')
-    let baselink = mrl[1]
-    let wk_partialpage = mrl[3]
-    let dirs_tocheck = ikiwiki#nav#GenPosLinkLoc(expand('%:p:h').'/'
-                                       \ .fnameescape(expand('%:p:t:r')))
-    if strlen(baselink) == 0
-      for _path in dirs_tocheck
-        call extend(completions,
-                  \ map(s:AddIdxLinks(split(glob(_path . '/'.wk_partialpage.'*'), "\n")),
-                      \ 's:FormatCmpl(v:val, baselink, wk_partialpage)'))
-      endfor
-      return completions
-    endif
-    let baselink = strpart(baselink, 0, strlen(baselink) - 1) " strip last /
+function! ikiwiki#cmpl#IkiOmniCpl(findstart, base) " {{{1
+  if a:findstart == 1
+    return s:FindCplStart()
+  endif
+  let completions = []
+  let mrl = matchlist(a:base, '^\(\([^/]*/\)*\)\([^/]*\)$')
+  let baselink = mrl[1]
+  let wk_partialpage = mrl[3]
+  let dirs_tocheck = ikiwiki#nav#GenPosLinkLoc(expand('%:p:h').'/'
+                                     \ .fnameescape(expand('%:p:t:r')))
+  if strlen(baselink) == 0
     for _path in dirs_tocheck
-      let plinkloc = ikiwiki#nav#BestLink2FName(_path, baselink.'/dummy')
-      let exs_dir = plinkloc[0][0]
-      if strlen(exs_dir) != strlen(_path) + strlen(baselink) + 1
-        continue
-      endif
       call extend(completions,
-                \ map(s:AddIdxLinks(split(glob(exs_dir . '/'.wk_partialpage.'*'), "\n")),
+                \ map(s:AddIdxLinks(split(glob(_path . '/'.wk_partialpage.'*'), "\n")),
                     \ 's:FormatCmpl(v:val, baselink, wk_partialpage)'))
     endfor
     return completions
-  endfunction
-endif "}}}1
+  endif
+  let baselink = strpart(baselink, 0, strlen(baselink) - 1) " strip last /
+  for _path in dirs_tocheck
+    let plinkloc = ikiwiki#nav#BestLink2FName(_path, baselink.'/dummy')
+    let exs_dir = plinkloc[0][0]
+    if strlen(exs_dir) != strlen(_path) + strlen(baselink) + 1
+      continue
+    endif
+    call extend(completions,
+              \ map(s:AddIdxLinks(split(glob(exs_dir . '/'.wk_partialpage.'*'), "\n")),
+                  \ 's:FormatCmpl(v:val, baselink, wk_partialpage)'))
+  endfor
+  return completions
+endfunction " }}}1
 
