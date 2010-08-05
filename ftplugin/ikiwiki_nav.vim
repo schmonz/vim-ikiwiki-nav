@@ -1,5 +1,5 @@
 " vim: fdm=marker
-" {{{1
+" {{{1 LICENSE
 " Copyright: 2010 Javier Rojas <jerojasro@devnull.li>
 "
 " License:
