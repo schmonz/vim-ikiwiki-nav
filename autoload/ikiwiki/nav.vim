@@ -50,33 +50,53 @@ let s:wl_pat = '\v\[\[[^\!\]][^\[\]]*\]\]'
 " (it ain't surrounded by [[]])
 " * WikiLinkText(), when the cursor is over '[[Hi There|hi_there]]' will
 "   return 'hi_there'
-"
-" Problems:
-" This doesn't work over multiline wikilinks, like [[hi
-" there|hi_there]]
 function! s:WikiLinkText() " {{{1
-  let start = 0
-  let cpos = col(".") - 1
-  let wl_ftext = ''
-  while 1
-    let left_i = match(getline("."), s:wl_pat, start)
-    if left_i < 0
-      return ''
-    endif
-    if left_i > cpos
-      return ''
-    endif 
-    let right_i = matchend(getline("."), s:wl_pat, start)
-    if cpos < right_i
-      let wl_ftext = matchstr(getline("."), s:wl_pat, start)
-      break
-    endif
-    let start = right_i
-  endwhile
-  if match(wl_ftext, '|') >= 0
-    return matchlist(wl_ftext, '\v(\[)*[^\[\| ]*\|([^\] ]+)(\])*')[2]
+  let NOT_FOUND = ''
+
+  let ccol = col('.')
+  let cline = line('.')
+  let ikilink_ini = searchpos('\%(^\|[^\\]\)\zs\[\[\ze\($\|[^!]\)', 'bcnW')
+  call cursor(cline, ccol - 1)
+  let ikilink_end = searchpos('\]\]', 'cnW')
+  call cursor(cline, ccol)
+  let next_ikilink_ini = searchpos('\%(^\|[^\\]\)\zs\[\[', 'nW')
+  call cursor(cline, ccol - 1)
+  let prev_ikilink_end = searchpos('\]\]', 'bnW')
+  call cursor(cline, ccol)
+
+  " check that we are between some [[ ]]
+  if (ikilink_ini[0] == 0 && ikilink_ini[1] == 0)
+        \ || (ikilink_end[0] == 0 && ikilink_end[1] == 0)
+    return NOT_FOUND
   endif
-  return matchlist(wl_ftext, '\v(\[)*([^\[\] ]+)(\])*')[2]
+
+  " check that we are not confusing the ikilink opening with the one of a
+  " previous ikilink
+  "
+  " [[yaddayadda]] blabla blaCURSOR_HERE
+  if prev_ikilink_end[0] != 0 && prev_ikilink_end[1] != 0
+        \ && ikilink_ini[0] < prev_ikilink_end[0]
+        \ || (ikilink_ini[0] == prev_ikilink_end[0]
+        \     && ikilink_ini[1] < prev_ikilink_end[1])
+    return NOT_FOUND
+  endif
+
+  " check that we are not confusing the ikilink closing with the one of a
+  " previous ikilink
+  "
+  " blaCURSOR_HERE blabla [[yaddayadda]]
+  if next_ikilink_ini[0] != 0 && next_ikilink_ini[1] != 0
+        \ && ikilink_end[0] > next_ikilink_ini[0]
+        \ || (ikilink_end[0] == next_ikilink_ini[0]
+        \     && ikilink_end[1] > next_ikilink_ini[1])
+    return NOT_FOUND
+  endif
+
+  let st = 1
+  if ikilink_end[0] == ikilink_ini[0]
+    let st = ikilink_ini[1] + 1
+  endif
+  return matchlist(getline(ikilink_end[0]), '\([^|]\{-}\)]]', st)[1]
 endfunction " }}}1
 
 " {{{1 searches for the best conversion of link_text to a path in the
