@@ -1,8 +1,9 @@
-  * Handle properly the anchors. For now just ignore them, in the future maybe
-    look for the anchor location and jump there.
+  * Handle properly the anchors (#, locations inside a markdown page). For now
+    just ignore them, in the future maybe look for the anchor location and jump
+    there.
   * Add docs in vim format
-  * Recognize multiline wikilinks
   * support for wintendo
   * Allow the automatic creation of the file (and its container directories, if
     that applies) for a wikilink
+  * Support [[link text|link]] for completion
 
