@@ -5,5 +5,4 @@
   * support for wintendo
   * Allow the automatic creation of the file (and its container directories, if
     that applies) for a wikilink
-  * Support [[link text|link]] for completion
 
