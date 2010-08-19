@@ -9,33 +9,37 @@
 " in other words, the position from which the omni-completion is allowed to
 " modify the current line
 "
-" TODO account for the following:
-"
-" asdfasd af [[adfads]] adfads
-"                         ^
-" it should NOT do the completion, but as of now it tries, by passing in the
-" second call the base text 'adfads]] adf' (for this example)
-"
-" TODO account for [[link name|link_url]]
-"
-" TODO account for multiline links
-"
 " TODO unify the link search with the navigation part; both of them use the link
 " extraction functionality
 "
 "}}}1
 function! s:FindCplStart() " {{{1
+  let cc = col('.')
+  let haystack = getline('.')[:cc-1]
+  let linktext_sep = '|'
+  let li_sep_loc = strridx(haystack, linktext_sep, cc-strlen(linktext_sep))
   let link_str = '[['
-  let dir_str = '[[!'
-  let li_loc = strridx(getline('.'), link_str, col('.'))
+  let li_loc = strridx(haystack, link_str, cc-strlen(link_str))
+  if li_loc < li_sep_loc
+    let li_loc = li_sep_loc
+    let offset = strlen(linktext_sep)
+  else
+    let offset = strlen(link_str)
+  endif
   if li_loc < 0
     return -1
   endif
-  let di_loc = strridx(getline('.'), dir_str, col('.'))
+  let link_end = ']]'
+  let li_endloc = strridx(haystack, link_end, cc-strlen(link_end))
+  if li_endloc > li_loc
+    return -1
+  endif
+  let dir_str = '[[!'
+  let di_loc = strridx(haystack, dir_str, col('.')-strlen(dir_str))
   if di_loc == li_loc
     return -1
   endif
-  return li_loc + strlen(link_str)
+  return li_loc + offset
 endfunction " }}}1
 
 
