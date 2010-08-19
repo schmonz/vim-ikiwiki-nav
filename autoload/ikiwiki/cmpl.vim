@@ -129,7 +129,11 @@ endfunction " }}}1
 " TODO add limits to the completion list size
 function! ikiwiki#cmpl#IkiOmniCpl(findstart, base) " {{{1
   if a:findstart == 1
-    return s:FindCplStart()
+    let s:r = s:FindCplStart()
+    return s:r
+  endif
+  if s:r < 0
+    return []
   endif
   let completions = []
   let mrl = matchlist(a:base, '^\(\([^/]*/\)*\)\([^/]*\)$')
