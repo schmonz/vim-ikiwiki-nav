@@ -154,10 +154,14 @@ function! ikiwiki#nav#BestLink2FName(real_path, link_text) " {{{1
     let matches = filter(poss_files,
                        \ 'v:val ==? "'.existent_path.'/'.fnameescape(cdir).'"')
     if len(matches) == 0
+      " we can't match the given link with the files in the current real path,
+      " so return to ask caller to give us another real_path
       return [[existent_path, dirs, page_fname],
             \ [existent_path, dirs.'/'.page_dname, 'index.mdwn']]
     endif
 
+    " cdir exists, put it into the existent path, remove it from the beggining
+    " of the link (dirs)
     let existent_path = matches[0]
     let dirs = substitute(dirs, '^'.cdir.'/\?', '', '')
   endwhile
@@ -172,6 +176,7 @@ function! ikiwiki#nav#BestLink2FName(real_path, link_text) " {{{1
 
   " check existence of (dirs)/page/index.mdwn
   " 
+  " 1. check for (dirs)/page
   let poss_files = split(glob(existent_path . '/*'), "\n")
   let matches = filter(poss_files,
                      \ 'v:val ==? "'.existent_path.'/'.page_dname.'"')
