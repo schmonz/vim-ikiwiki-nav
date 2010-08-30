@@ -235,16 +235,9 @@ function! ikiwiki#nav#GoToWikiPage() " {{{1
   endif
   for _path in dirs_tocheck
     let plinkloc = ikiwiki#nav#BestLink2FName(_path, wl_text)
-    let stdlinkform = plinkloc[0] " (dirs)/page.mdwn
-    if strlen(stdlinkform[1]) == 0 && strlen(stdlinkform[2]) == 0
-      " yay, the file exists
+    let stdlinkform = plinkloc[0]
+    if len(plinkloc) == 1
       exec 'e ' .stdlinkform[0]
-      return
-    endif
-    let altlinkform = plinkloc[0] " (dirs)/page/index.mdwn
-    if strlen(altlinkform[1]) == 0 && strlen(altlinkform[2]) == 0
-      " yay, the file exists
-      exec 'e '.altlinkform[0]
       return
     endif
   endfor
