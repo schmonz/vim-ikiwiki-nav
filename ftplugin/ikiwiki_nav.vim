@@ -45,7 +45,7 @@ set cpo&vim
 
 " command definitions {{{1
 if !exists(":IkiJumpToPage")
-  command IkiJumpToPage :call ikiwiki#nav#GoToWikiPage()
+  command IkiJumpToPage :call ikiwiki#nav#GoToWikiPage(0)
 endif
 if !exists(":IkiNextWikiLink")
   command -nargs=1 IkiNextWikiLink :call ikiwiki#nav#NextWikiLink(<args>)

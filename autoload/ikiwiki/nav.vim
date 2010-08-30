@@ -218,9 +218,11 @@ endfunction " }}}1
 
 " {{{1 Opens the file associated with the WikiLink currently under the cursor
 "
-" If no file can be found, prints a messages, and does nothing
+" If no file can be found, the behaviour depends on the create_page argument.
+" If it is true, the wiki page will be created. If not, an error message
+" indicating that the page does not exist will be printed
 "
-function! ikiwiki#nav#GoToWikiPage() " {{{1
+function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
   let wl_text = s:WikiLinkText()
   if wl_text == ''
     echo "No wikilink found under the cursor"
@@ -233,15 +235,20 @@ function! ikiwiki#nav#GoToWikiPage() " {{{1
     let dirs_tocheck = ikiwiki#nav#GenPosLinkLoc(expand('%:p:h').'/'
                                      \ .fnameescape(expand('%:p:t:r')))
   endif
+  let exs_dirs = {}
   for _path in dirs_tocheck
     let plinkloc = ikiwiki#nav#BestLink2FName(_path, wl_text)
+    let exs_dirs[_path] = plinkloc
     let stdlinkform = plinkloc[0]
     if len(plinkloc) == 1
       exec 'e ' .stdlinkform[0]
       return
     endif
   endfor
-  echo "File does not exist - '".wl_text."'"
+  if a:create_page
+  else
+    echo "File does not exist - '".wl_text."'"
+  endif
 endfunction " }}}1
 
 " {{{1 Moves the cursor to the nearest WikiLink in the buffer
