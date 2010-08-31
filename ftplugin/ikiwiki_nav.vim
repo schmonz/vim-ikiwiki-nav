@@ -43,13 +43,16 @@ let b:loaded_ikiwiki_nav = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
+" command definitions {{{1
 if !exists(":IkiJumpToPage")
   command IkiJumpToPage :call ikiwiki#nav#GoToWikiPage()
 endif
 if !exists(":IkiNextWikiLink")
   command -nargs=1 IkiNextWikiLink :call ikiwiki#nav#NextWikiLink(<args>)
 endif
+" }}}1
 
+" mapping definitions {{{1
 if !(hasmapto(':IkiJumpToPage'))
   noremap <unique> <buffer> <CR> :IkiJumpToPage<CR>
 endif
@@ -59,5 +62,6 @@ if !(hasmapto(':IkiNextWikiLink'))
 endif
 
 noremap <buffer> <Backspace> <C-o>
+" }}}1
 
 let &cpo = s:save_cpo
