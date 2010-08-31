@@ -47,6 +47,9 @@ set cpo&vim
 if !exists(":IkiJumpToPage")
   command IkiJumpToPage :call ikiwiki#nav#GoToWikiPage(0)
 endif
+if !exists(":IkiJumpOrCreatePage")
+  command IkiJumpOrCreatePage :call ikiwiki#nav#GoToWikiPage(1)
+endif
 if !exists(":IkiNextWikiLink")
   command -nargs=1 IkiNextWikiLink :call ikiwiki#nav#NextWikiLink(<args>)
 endif
@@ -55,6 +58,9 @@ endif
 " mapping definitions {{{1
 if !(hasmapto(':IkiJumpToPage'))
   noremap <unique> <buffer> <CR> :IkiJumpToPage<CR>
+endif
+if !(hasmapto(':IkiJumpOrCreatePage'))
+  noremap <unique> <buffer> <Leader>n :IkiJumpOrCreatePage<CR>
 endif
 if !(hasmapto(':IkiNextWikiLink'))
   noremap <buffer> <C-j> :IkiNextWikiLink 0<CR>
