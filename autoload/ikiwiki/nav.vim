@@ -216,6 +216,50 @@ function! ikiwiki#nav#GenPosLinkLoc(base_path) " {{{1
   return pos_locs
 endfunction " }}}1
 
+let s:DIR_WRITE = 2 " value returned by filewritable when a dir is writable
+let s:SEP = ' - '
+function! s:SortByLen(a, b)
+  return strlen(a:a) - strlen(a:b)
+endfunction
+"{{{1 creates a wiki page
+" }}}1
+function! s:CreateWikiPage(pos_locations) "{{{1
+  let opts = ['Choose location of the link:']
+  let idx = 1
+  " get user selection
+  for loc in a:pos_locations
+    let pagespec = loc[1][0] " std link form
+    let opt_text = pagespec[0] . (pagespec[0] =~ '^/$' ? '' : '/') 
+       \ . s:SEP . (pagespec[1] =~ '.' ? pagespec[1] . '/' : '') . pagespec[2]
+    call add(opts, string(idx) . '. ' . opt_text)
+    let idx = idx + 1
+  endfor
+  call sort(opts, function("s:SortByLen"))
+  let choice = inputlist(opts)
+  if choice <= 0 || choice >= len(opts)
+    echomsg 'No location chosen'
+    return
+  endif
+
+  " check for existence of mkdir()
+  let pagespec = a:pos_locations[choice - 1][1][0]
+  let ndir = pagespec[0] . (pagespec[0] =~ '^/$' ? '' : '/') . pagespec[1]
+  try
+    call mkdir(ndir, "p")
+  catch /739/
+    if !isdirectory(ndir)
+      echoerr 'Could not create directory ' . ndir
+      return
+    endif
+  endtry
+  if filewritable(ndir) != s:DIR_WRITE
+      echoerr 'Can''t write to directory ' . ndir
+      return
+  endif
+  let fn = ndir . '/' . pagespec[2]
+  exec 'e ' . fn
+endfunction "}}}1
+
 " {{{1 Opens the file associated with the WikiLink currently under the cursor
 "
 " If no file can be found, the behaviour depends on the create_page argument.
@@ -235,10 +279,10 @@ function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
     let dirs_tocheck = ikiwiki#nav#GenPosLinkLoc(expand('%:p:h').'/'
                                      \ .fnameescape(expand('%:p:t:r')))
   endif
-  let exs_dirs = {}
+  let exs_dirs = []
   for _path in dirs_tocheck
     let plinkloc = ikiwiki#nav#BestLink2FName(_path, wl_text)
-    let exs_dirs[_path] = plinkloc
+    call add(exs_dirs, [_path, plinkloc])
     let stdlinkform = plinkloc[0]
     if len(plinkloc) == 1
       exec 'e ' .stdlinkform[0]
@@ -246,6 +290,7 @@ function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
     endif
   endfor
   if a:create_page
+    call s:CreateWikiPage(exs_dirs)
   else
     echo "File does not exist - '".wl_text."'"
   endif
