@@ -250,7 +250,7 @@ function! s:SortByLen(a, b)
 endfunction
 "{{{1 creates a wiki page
 " }}}1
-function! s:CreateWikiPage(pos_locations) "{{{1
+function! s:SelectLink(pos_locations) "{{{1
   let pos_locations = copy(a:pos_locations)
   call sort(pos_locations, function("s:SortByLen"))
   let opts = ['Choose location of the link:']
@@ -268,7 +268,6 @@ function! s:CreateWikiPage(pos_locations) "{{{1
     return
   endif
 
-  " TODO check for existence of mkdir()
   let pagespec = a:pos_locations[choice - 1][1][0]
   let ndir = pagespec[0] . (pagespec[0] =~ '^/$' ? '' : '/') . pagespec[1]
   return [ndir, pagespec[2]]
@@ -307,7 +306,7 @@ function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
     echo "File does not exist - '".wl_text."'"
     return
   endif
-  let res = s:CreateWikiPage(exs_dirs)
+  let res = s:SelectLink(exs_dirs)
   if !res
     echomsg 'No option selected'
     return
