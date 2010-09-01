@@ -141,21 +141,38 @@ endfunction " }}}1
 "
 " BestLink2FName('/home/user/wiki', 'dir1/otherdir/MyPage') will return
 " [['/home/user/wiki/dir1/', 'otherdir', 'MyPage.mdwn'], ['/home/user/wiki/dir1/', 'otherdir/MyPage', 'index.mdwn']] 
-"
-" TODO FIXME XXX this thing is not checking for non-existent directories
-" properly
 function! ikiwiki#nav#BestLink2FName(real_path, link_text) " {{{1
   let link_text = a:link_text
-  let existent_path = a:real_path
   if match(link_text, '^/\|/$\|^$') >= 0
     throw 'IWNAV:INVALID_LINK('.link_text
           \ .'): has a leading or trailing /, or is empty'
   endif
+
   let page_name = matchstr(link_text, '[^/]\+$')
   let page_fname = fnameescape(page_name.'.mdwn')
   let page_dname = fnameescape(page_name)
   let dirs = substitute(link_text, '/\?'.page_name.'$', '', '')
-  " check the existence of all the dirs (parents of) of the page
+  " check real_path
+  let existent_path = a:real_path
+  let ned = []
+  while 1
+    if isdirectory(existent_path)
+      break
+    endif
+    let r = s:GetPathTail(existent_path)
+    let existent_path = r[0]
+    call add(ned, r[1])
+  endwhile
+  let neds = join(ned, '/')
+  if strlen(neds) > 0
+    if dirs =~ '^/'
+      let dirs = '/' . neds . dirs
+    else
+      let dirs =  neds . '/' . dirs
+    endif
+  endif
+  " check the existence of all the dirs (parents of) of the page that appear
+  " in the link
   while dirs != ''
     let cdir = matchstr(dirs, '^[^/]\+')
 
