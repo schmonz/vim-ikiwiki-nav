@@ -265,27 +265,13 @@ function! s:CreateWikiPage(pos_locations) "{{{1
   endfor
   let choice = inputlist(opts)
   if choice <= 0 || choice >= len(opts)
-    echomsg 'No location chosen'
     return
   endif
 
   " TODO check for existence of mkdir()
   let pagespec = a:pos_locations[choice - 1][1][0]
   let ndir = pagespec[0] . (pagespec[0] =~ '^/$' ? '' : '/') . pagespec[1]
-  try
-    call mkdir(ndir, "p")
-  catch /739/
-    if !isdirectory(ndir)
-      echoerr 'Could not create directory ' . ndir
-      return
-    endif
-  endtry
-  if filewritable(ndir) != s:DIR_WRITE
-    echoerr 'Can''t write to directory ' . ndir
-    return
-  endif
-  let fn = ndir . '/' . pagespec[2]
-  exec 'e ' . fn
+  return [ndir, pagespec[2]]
 endfunction "}}}1
 
 " {{{1 Opens the file associated with the WikiLink currently under the cursor
@@ -317,11 +303,31 @@ function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
       return
     endif
   endfor
-  if a:create_page
-    call s:CreateWikiPage(exs_dirs)
-  else
+  if !a:create_page
     echo "File does not exist - '".wl_text."'"
+    return
   endif
+  let res = s:CreateWikiPage(exs_dirs)
+  if !res
+    echomsg 'No option selected'
+    return
+  endif
+  let ndir = res[0]
+  let pagname = res[1]
+  try
+    call mkdir(ndir, "p")
+  catch /739/
+    if !isdirectory(ndir)
+      echoerr 'Could not create directory ' . ndir
+      return
+    endif
+  endtry
+  if filewritable(ndir) != s:DIR_WRITE
+    echoerr 'Can''t write to directory ' . ndir
+    return
+  endif
+  let fn = ndir . '/' . pagname
+  exec 'e ' . fn
 endfunction " }}}1
 
 " {{{1 Moves the cursor to the nearest WikiLink in the buffer
