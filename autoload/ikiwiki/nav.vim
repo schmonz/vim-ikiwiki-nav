@@ -140,7 +140,7 @@ function! ikiwiki#nav#BestLink2FName(real_path, link_text) " {{{1
   let existent_path = a:real_path
   if match(link_text, '^/\|/$\|^$') >= 0
     throw 'IWNAV:INVALID_LINK('.link_text
-        \ .'): has a leading or trailing /, or is empty'
+          \ .'): has a leading or trailing /, or is empty'
   endif
   let page_name = matchstr(link_text, '[^/]\+$')
   let page_fname = fnameescape(page_name.'.mdwn')
@@ -152,7 +152,7 @@ function! ikiwiki#nav#BestLink2FName(real_path, link_text) " {{{1
 
     let poss_files = split(glob(existent_path . '/*'), "\n")
     let matches = filter(poss_files,
-                       \ 'v:val ==? "'.existent_path.'/'.fnameescape(cdir).'"')
+          \ 'v:val ==? "'.existent_path.'/'.fnameescape(cdir).'"')
     if len(matches) == 0
       " we can't match the given link with the files in the current real path,
       " so return to ask caller to give us another real_path
@@ -169,7 +169,7 @@ function! ikiwiki#nav#BestLink2FName(real_path, link_text) " {{{1
   " check existence of (dirs)/page.mdwn
   let poss_files = split(glob(existent_path . '/*'), "\n")
   let matches = filter(poss_files,
-                     \ 'v:val ==? "'.existent_path.'/'.page_fname.'"')
+        \ 'v:val ==? "'.existent_path.'/'.page_fname.'"')
   if len(matches) > 0
     return [[matches[0], '', '']]
   endif
@@ -179,12 +179,12 @@ function! ikiwiki#nav#BestLink2FName(real_path, link_text) " {{{1
   " 1. check for (dirs)/page
   let poss_files = split(glob(existent_path . '/*'), "\n")
   let matches = filter(poss_files,
-                     \ 'v:val ==? "'.existent_path.'/'.page_dname.'"')
+        \ 'v:val ==? "'.existent_path.'/'.page_dname.'"')
   if len(matches) > 0
     let existent_path = matches[0]
     let poss_files = split(glob(existent_path . '/*'), "\n")
     let matches = filter(poss_files,
-                       \ 'v:val ==? "'.existent_path.'/index.mdwn"')
+          \ 'v:val ==? "'.existent_path.'/index.mdwn"')
     if len(matches) > 0
       return [[matches[0], '', '']]
     else
@@ -219,22 +219,28 @@ endfunction " }}}1
 let s:DIR_WRITE = 2 " value returned by filewritable when a dir is writable
 let s:SEP = ' - '
 function! s:SortByLen(a, b)
-  return strlen(a:a) - strlen(a:b)
+  " access the list returned by BestLink2FName (1),
+  " then grab the first option (stdlink, 0)
+  "   then grab the dir that must be created (1)
+  "   then add the filename (2)
+  return (strlen(a:a[1][0][1]) + strlen(a:a[1][0][2]))
+        \ - (strlen(a:b[1][0][2]) + strlen(a:b[1][0][2]))
 endfunction
 "{{{1 creates a wiki page
 " }}}1
 function! s:CreateWikiPage(pos_locations) "{{{1
+  let pos_locations = copy(a:pos_locations)
+  call sort(pos_locations, function("s:SortByLen"))
   let opts = ['Choose location of the link:']
   let idx = 1
   " get user selection
-  for loc in a:pos_locations
+  for loc in pos_locations
     let pagespec = loc[1][0] " std link form
     let opt_text = pagespec[0] . (pagespec[0] =~ '^/$' ? '' : '/') 
-       \ . s:SEP . (pagespec[1] =~ '.' ? pagespec[1] . '/' : '') . pagespec[2]
+          \ . s:SEP . (pagespec[1] =~ '.' ? pagespec[1] . '/' : '') . pagespec[2]
     call add(opts, string(idx) . '. ' . opt_text)
     let idx = idx + 1
   endfor
-  call sort(opts, function("s:SortByLen"))
   let choice = inputlist(opts)
   if choice <= 0 || choice >= len(opts)
     echomsg 'No location chosen'
@@ -253,8 +259,8 @@ function! s:CreateWikiPage(pos_locations) "{{{1
     endif
   endtry
   if filewritable(ndir) != s:DIR_WRITE
-      echoerr 'Can''t write to directory ' . ndir
-      return
+    echoerr 'Can''t write to directory ' . ndir
+    return
   endif
   let fn = ndir . '/' . pagespec[2]
   exec 'e ' . fn
@@ -277,7 +283,7 @@ function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
     let dirs_tocheck = reverse(ikiwiki#nav#GenPosLinkLoc(expand('%:p:h')))
   else
     let dirs_tocheck = ikiwiki#nav#GenPosLinkLoc(expand('%:p:h').'/'
-                                     \ .fnameescape(expand('%:p:t:r')))
+          \ .fnameescape(expand('%:p:t:r')))
   endif
   let exs_dirs = []
   for _path in dirs_tocheck
