@@ -37,6 +37,15 @@
 
 let s:wl_pat = '\v\[\[[^\!\]][^\[\]]*\]\]'
 
+" {{{1 takes a '/' separated path and returns 
+" [head of the path, last component of the path]
+"
+" Example:
+"   s:GetPathTail('/home/gonzo') will return ['/home', 'gonzo']
+function! s:GetPathTail(path) " {{{1
+  return [fnamemodify(a:path, ':p:h'), fnamemodify(a:path, ':p:t')]
+endfunction " }}}1
+
 " {{{1 Searches the current line of the current buffer (where the cursor is
 " located) for anything that looks like a wikilink and that has the cursor
 " placed on it, and returns its link text
