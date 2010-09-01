@@ -1,5 +1,5 @@
 " vim: fdm=marker
-" {{{1
+" {{{1 Legalese
 " Copyright: 2010 Javier Rojas <jerojasro@devnull.li>
 "
 " License:
@@ -247,7 +247,7 @@ function! s:CreateWikiPage(pos_locations) "{{{1
     return
   endif
 
-  " check for existence of mkdir()
+  " TODO check for existence of mkdir()
   let pagespec = a:pos_locations[choice - 1][1][0]
   let ndir = pagespec[0] . (pagespec[0] =~ '^/$' ? '' : '/') . pagespec[1]
   try
