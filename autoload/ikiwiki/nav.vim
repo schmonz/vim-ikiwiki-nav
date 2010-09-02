@@ -238,7 +238,7 @@ function! ikiwiki#nav#GenPosLinkLoc(base_path) " {{{1
   return pos_locs
 endfunction " }}}1
 
-let s:DIR_WRITE = 2 " value returned by filewritable when a dir is writable
+let s:DIR_WRITABLE = 2 " value returned by filewritable when a dir is writable
 let s:SEP = ' - '
 function! s:SortByLen(a, b)
   " access the list returned by BestLink2FName (1),
@@ -321,7 +321,7 @@ function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
       return
     endif
   endtry
-  if filewritable(ndir) != s:DIR_WRITE
+  if filewritable(ndir) != s:DIR_WRITABLE
     echoerr 'Can''t write to directory ' . ndir
     return
   endif
