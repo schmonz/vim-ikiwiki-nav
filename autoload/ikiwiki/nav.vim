@@ -240,7 +240,7 @@ endfunction " }}}1
 
 let s:DIR_WRITABLE = 2 " value returned by filewritable when a dir is writable
 let s:SEP = ' - '
-function! s:SortByLen(a, b)
+function! s:SortOptions(opts)
   " access the list returned by BestLink2FName (1),
   " then grab the first option (stdlink, 0)
   "   then grab the dir that must be created (1)
@@ -276,8 +276,9 @@ endfunction "}}}1
 " {{{1 Opens the file associated with the WikiLink currently under the cursor
 "
 " If no file can be found, the behaviour depends on the create_page argument.
-" If it is true, the wiki page will be created. If not, an error message
-" indicating that the page does not exist will be printed
+" If it is true, the wiki page (and the extra directories implicated by its
+" name) will be created. If not, an error message indicating that the page
+" does not exist will be printed
 "
 function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
   let wl_text = s:WikiLinkText()
