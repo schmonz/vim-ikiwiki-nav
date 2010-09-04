@@ -240,19 +240,42 @@ endfunction " }}}1
 
 let s:DIR_WRITABLE = 2 " value returned by filewritable when a dir is writable
 let s:SEP = ' - '
-function! s:SortOptions(opts)
-  " access the list returned by BestLink2FName (1),
-  " then grab the first option (stdlink, 0)
-  "   then grab the dir that must be created (1)
-  "   then add the filename (2)
-  return (strlen(a:a[1][0][1]) + strlen(a:a[1][0][2]))
-        \ - (strlen(a:b[1][0][2]) + strlen(a:b[1][0][2]))
-endfunction
+function! s:SortOptions(opts) " {{{1
+  if len(a:opts) <= 1
+    return a:opts
+  endif
+  let mp = len(a:opts) / 2
+  let L = s:SortOptions(a:opts[:mp - 1])
+  let R = s:SortOptions(a:opts[mp :])
+  let res = []
+  let lL = mp
+  let lR = len(a:opts) - mp
+  let iL = 0
+  let iR = 0
+  while iL < lL && iR < lR
+    if ((strlen(L[iL][1][0][1]) + strlen(L[iL][1][0][2]))
+        \ - (strlen(R[iR][1][0][2]) + strlen(R[iR][1][0][2]))) <= 0
+      call add(res, L[iL])
+      let iL = iL + 1
+    else
+      call add(res, R[iR])
+      let iR = iR + 1
+    endif
+  endwhile
+  while iL < lL
+    call add(res, L[iL])
+    let iL = iL + 1
+  endwhile
+  while iR < lR
+    call add(res, R[iR])
+    let iR = iR + 1
+  endwhile
+  return res
+endfunction " }}}1
 "{{{1 creates a wiki page
 " }}}1
 function! s:SelectLink(pos_locations) "{{{1
-  let pos_locations = copy(a:pos_locations)
-  call sort(pos_locations, function("s:SortByLen"))
+  let pos_locations = s:SortOptions(a:pos_locations)
   let opts = ['Choose location of the link:']
   let idx = 1
   " get user selection
