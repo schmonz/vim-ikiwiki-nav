@@ -1,5 +1,5 @@
 " vim: fdm=marker
-" {{{1
+" {{{1 Legalese
 " Copyright: 2010 Javier Rojas <jerojasro@devnull.li>
 "
 " License:
@@ -32,6 +32,15 @@
 " }}}1
 
 let s:wl_pat = '\v\[\[[^\!\]][^\[\]]*\]\]'
+
+" {{{1 takes a '/' separated path and returns 
+" [head of the path, last component of the path]
+"
+" Example:
+"   s:GetPathTail('/home/gonzo') will return ['/home', 'gonzo']
+function! s:GetPathTail(path) " {{{1
+  return [fnamemodify(a:path, ':p:h'), fnamemodify(a:path, ':p:t')]
+endfunction " }}}1
 
 " {{{1 Searches the current line of the current buffer (where the cursor is
 " located) for anything that looks like a wikilink and that has the cursor
@@ -128,27 +137,44 @@ endfunction " }}}1
 "
 " BestLink2FName('/home/user/wiki', 'dir1/otherdir/MyPage') will return
 " [['/home/user/wiki/dir1/', 'otherdir', 'MyPage.mdwn'], ['/home/user/wiki/dir1/', 'otherdir/MyPage', 'index.mdwn']] 
-"
-" TODO FIXME XXX this thing is not checking for non-existent directories
-" properly
 function! ikiwiki#nav#BestLink2FName(real_path, link_text) " {{{1
   let link_text = a:link_text
-  let existent_path = a:real_path
   if match(link_text, '^/\|/$\|^$') >= 0
     throw 'IWNAV:INVALID_LINK('.link_text
-        \ .'): has a leading or trailing /, or is empty'
+          \ .'): has a leading or trailing /, or is empty'
   endif
+
   let page_name = matchstr(link_text, '[^/]\+$')
   let page_fname = fnameescape(page_name.'.mdwn')
   let page_dname = fnameescape(page_name)
   let dirs = substitute(link_text, '/\?'.page_name.'$', '', '')
-  " check the existence of all the dirs (parents of) of the page
+  " check real_path
+  let existent_path = a:real_path
+  let ned = []
+  while 1
+    if isdirectory(existent_path)
+      break
+    endif
+    let r = s:GetPathTail(existent_path)
+    let existent_path = r[0]
+    call add(ned, r[1])
+  endwhile
+  let neds = join(ned, '/')
+  if strlen(neds) > 0
+    if dirs =~ '^/'
+      let dirs = '/' . neds . dirs
+    else
+      let dirs =  neds . '/' . dirs
+    endif
+  endif
+  " check the existence of all the dirs (parents of) of the page that appear
+  " in the link
   while dirs != ''
     let cdir = matchstr(dirs, '^[^/]\+')
 
     let poss_files = split(glob(existent_path . '/*'), "\n")
     let matches = filter(poss_files,
-                       \ 'v:val ==? "'.existent_path.'/'.fnameescape(cdir).'"')
+          \ 'v:val ==? "'.existent_path.'/'.fnameescape(cdir).'"')
     if len(matches) == 0
       " we can't match the given link with the files in the current real path,
       " so return to ask caller to give us another real_path
@@ -165,7 +191,7 @@ function! ikiwiki#nav#BestLink2FName(real_path, link_text) " {{{1
   " check existence of (dirs)/page.mdwn
   let poss_files = split(glob(existent_path . '/*'), "\n")
   let matches = filter(poss_files,
-                     \ 'v:val ==? "'.existent_path.'/'.page_fname.'"')
+        \ 'v:val ==? "'.existent_path.'/'.page_fname.'"')
   if len(matches) > 0
     return [[matches[0], '', '']]
   endif
@@ -175,12 +201,12 @@ function! ikiwiki#nav#BestLink2FName(real_path, link_text) " {{{1
   " 1. check for (dirs)/page
   let poss_files = split(glob(existent_path . '/*'), "\n")
   let matches = filter(poss_files,
-                     \ 'v:val ==? "'.existent_path.'/'.page_dname.'"')
+        \ 'v:val ==? "'.existent_path.'/'.page_dname.'"')
   if len(matches) > 0
     let existent_path = matches[0]
     let poss_files = split(glob(existent_path . '/*'), "\n")
     let matches = filter(poss_files,
-                       \ 'v:val ==? "'.existent_path.'/index.mdwn"')
+          \ 'v:val ==? "'.existent_path.'/index.mdwn"')
     if len(matches) > 0
       return [[matches[0], '', '']]
     else
@@ -212,11 +238,49 @@ function! ikiwiki#nav#GenPosLinkLoc(base_path) " {{{1
   return pos_locs
 endfunction " }}}1
 
+let s:DIR_WRITABLE = 2 " value returned by filewritable when a dir is writable
+let s:SEP = ' - '
+function! s:SortOptions(opts)
+  " access the list returned by BestLink2FName (1),
+  " then grab the first option (stdlink, 0)
+  "   then grab the dir that must be created (1)
+  "   then add the filename (2)
+  return (strlen(a:a[1][0][1]) + strlen(a:a[1][0][2]))
+        \ - (strlen(a:b[1][0][2]) + strlen(a:b[1][0][2]))
+endfunction
+"{{{1 creates a wiki page
+" }}}1
+function! s:SelectLink(pos_locations) "{{{1
+  let pos_locations = copy(a:pos_locations)
+  call sort(pos_locations, function("s:SortByLen"))
+  let opts = ['Choose location of the link:']
+  let idx = 1
+  " get user selection
+  for loc in pos_locations
+    let pagespec = loc[1][0] " std link form
+    let opt_text = pagespec[0] . (pagespec[0] =~ '^/$' ? '' : '/') 
+          \ . s:SEP . (pagespec[1] =~ '.' ? pagespec[1] . '/' : '') . pagespec[2]
+    call add(opts, string(idx) . '. ' . opt_text)
+    let idx = idx + 1
+  endfor
+  let choice = inputlist(opts)
+  if choice <= 0 || choice >= len(opts)
+    return
+  endif
+
+  let pagespec = a:pos_locations[choice - 1][1][0]
+  let ndir = pagespec[0] . (pagespec[0] =~ '^/$' ? '' : '/') . pagespec[1]
+  return [ndir, pagespec[2]]
+endfunction "}}}1
+
 " {{{1 Opens the file associated with the WikiLink currently under the cursor
 "
-" If no file can be found, prints a messages, and does nothing
+" If no file can be found, the behaviour depends on the create_page argument.
+" If it is true, the wiki page (and the extra directories implicated by its
+" name) will be created. If not, an error message indicating that the page
+" does not exist will be printed
 "
-function! ikiwiki#nav#GoToWikiPage() " {{{1
+function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
   let wl_text = s:WikiLinkText()
   if wl_text == ''
     echo "No wikilink found under the cursor"
@@ -227,17 +291,43 @@ function! ikiwiki#nav#GoToWikiPage() " {{{1
     let dirs_tocheck = reverse(ikiwiki#nav#GenPosLinkLoc(expand('%:p:h')))
   else
     let dirs_tocheck = ikiwiki#nav#GenPosLinkLoc(expand('%:p:h').'/'
-                                     \ .fnameescape(expand('%:p:t:r')))
+          \ .fnameescape(expand('%:p:t:r')))
   endif
+  let exs_dirs = []
   for _path in dirs_tocheck
     let plinkloc = ikiwiki#nav#BestLink2FName(_path, wl_text)
+    call add(exs_dirs, [_path, plinkloc])
     let stdlinkform = plinkloc[0]
     if len(plinkloc) == 1
       exec 'e ' .stdlinkform[0]
       return
     endif
   endfor
-  echo "File does not exist - '".wl_text."'"
+  if !a:create_page
+    echo "File does not exist - '".wl_text."'"
+    return
+  endif
+  let res = s:SelectLink(exs_dirs)
+  if !res
+    echomsg 'No option selected'
+    return
+  endif
+  let ndir = res[0]
+  let pagname = res[1]
+  try
+    call mkdir(ndir, "p")
+  catch /739/
+    if !isdirectory(ndir)
+      echoerr 'Could not create directory ' . ndir
+      return
+    endif
+  endtry
+  if filewritable(ndir) != s:DIR_WRITABLE
+    echoerr 'Can''t write to directory ' . ndir
+    return
+  endif
+  let fn = ndir . '/' . pagname
+  exec 'e ' . fn
 endfunction " }}}1
 
 " {{{1 Moves the cursor to the nearest WikiLink in the buffer

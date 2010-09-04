@@ -3,6 +3,4 @@
     there.
   * Add docs in vim format
   * support for wintendo
-  * Allow the automatic creation of the file (and its container directories, if
-    that applies) for a wikilink
 
