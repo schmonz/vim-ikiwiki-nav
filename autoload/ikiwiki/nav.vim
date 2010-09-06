@@ -253,8 +253,7 @@ function! s:SortOptions(opts) " {{{1
   let iL = 0
   let iR = 0
   while iL < lL && iR < lR
-    if ((strlen(L[iL][1][0][1]) + strlen(L[iL][1][0][2]))
-        \ - (strlen(R[iR][1][0][2]) + strlen(R[iR][1][0][2]))) <= 0
+    if ((strlen(L[iL][1]) + strlen(L[iL][2])) - (strlen(R[iR][1]) + strlen(R[iR][2]))) <= 0
       call add(res, L[iL])
       let iL = iL + 1
     else
@@ -280,9 +279,8 @@ function! s:SelectLink(pos_locations) "{{{1
   let idx = 1
   " get user selection
   for loc in pos_locations
-    let pagespec = loc[1][0] " std link form
-    let opt_text = pagespec[0] . (pagespec[0] =~ '^/$' ? '' : '/') 
-          \ . s:SEP . (pagespec[1] =~ '.' ? pagespec[1] . '/' : '') . pagespec[2]
+    let opt_text = loc[0] . (loc[0] =~ '^/$' ? '' : '/') 
+          \ . s:SEP . (loc[1] =~ '.' ? loc[1] . '/' : '') . loc[2]
     call add(opts, string(idx) . '. ' . opt_text)
     let idx = idx + 1
   endfor
@@ -319,7 +317,7 @@ function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
   let exs_dirs = []
   for _path in dirs_tocheck
     let plinkloc = ikiwiki#nav#BestLink2FName(_path, wl_text)
-    call add(exs_dirs, [_path, plinkloc])
+    call add(exs_dirs, plinkloc[0])
     let stdlinkform = plinkloc[0]
     if len(plinkloc) == 1
       exec 'e ' .stdlinkform[0]
