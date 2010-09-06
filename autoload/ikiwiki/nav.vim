@@ -101,7 +101,7 @@ function! s:WikiLinkText() " {{{1
   if ikilink_end[0] == ikilink_ini[0]
     let st = ikilink_ini[1] + 1
   endif
-  return matchlist(getline(ikilink_end[0]), '\([^|]\{-}\)]]', st)[1]
+  return matchlist(getline(ikilink_end[0]), '\([^|]\{-}\)\%(#\|]]\)', st)[1]
 endfunction " }}}1
 
 " {{{1 searches for the best conversion of link_text to a path in the
