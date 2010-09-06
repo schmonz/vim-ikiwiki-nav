@@ -248,8 +248,8 @@ function! s:SortOptions(opts) " {{{1
   let L = s:SortOptions(a:opts[:mp - 1])
   let R = s:SortOptions(a:opts[mp :])
   let res = []
-  let lL = mp
-  let lR = len(a:opts) - mp
+  let lL = len(L)
+  let lR = len(R)
   let iL = 0
   let iR = 0
   while iL < lL && iR < lR
