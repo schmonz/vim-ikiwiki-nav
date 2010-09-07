@@ -1,0 +1,114 @@
+*ikiwiki-nav.txt*	Ftplugin to help creation and navigation of ikiwiki pages
+
+Author: Javier Rojas <jerojasro@devnull.li>
+Version: TODO
+License: TODO
+
+==============================================================================
+INTRODUCTION                                                   *ikiwiki-intro*
+
+This ftplugin provides several mechanisms to ease the process of writing and
+navigating ikiwiki wiki pages.
+
+This functionality is available for the 'ikiwiki' file type.
+
+Link name completion                                           |ikiwiki-compl|
+Jumping between wikilinks                                  |ikiwiki-nav-links|
+Jumping to pages                                           |ikiwiki-jump-page|
+Creating pages                                           |ikiwiki-create-page|
+Commands available and default mappings                     |ikiwiki-commands|
+Redefine mappings                                      |ikiwiki-redefine-maps|
+
+==============================================================================
+LINK NAME COMPLETION                                           *ikiwiki-compl*
+
+It completes links in a directory-wise fashion through the omni-completion
+mechanism. This takes into account 
+
+It completes not only pages, but files and directories.
+
+==============================================================================
+JUMPING BETWEEN WIKILINKS                                  *ikiwiki-nav-links*
+
+The commands |:IkiNextWikiLink| and |:IkiPrevWikiLink| move the cursor to the
+nearest wikilink ahead or behind the cursor, respectively.
+
+==============================================================================
+JUMPING TO PAGES                                           *ikiwiki-jump-page*
+
+When the cursor is over a wikilink, you can ask vim to open the file
+corresponding to the page which that link points to.
+
+There are 4 variants of this functionality. You can open the wiki page in:
+
+  1. The current window, (command |:IkiJumpToPageCW|)
+  2. A new horizontal splitted window (command |:IkiJumpToPageHW|).
+  3. A new vertical splitted window (command |:IkiJumpToPageVW|).
+  4. A new tab (command |:IkiJumpToPageNT|).
+
+==============================================================================
+CREATING PAGES                                           *ikiwiki-create-page*
+
+When the cursor is over a wikilink, the command :CreateWAWAWA makes vim try to
+open the file corresponding to the page the link points to, and if that fails,
+it offers the user the possibility of creating the page defined by the link.
+In this case, it offers the user a selection menu like the following:
+>
+    Choose:
+    profit!
+<
+Once the user chooses one of the elements of the selection list, the file will
+be created, including the needed directories defined in the link, and opened
+in vim.
+
+There are 4 variants of this functionality. Once you select the page's base
+location you can open its buffer in:
+
+  1. The current window, (command |:IkiJumpOrCreatePageCW|)
+  2. A new horizontal splitted window (command |:IkiJumpOrCreatePageHW|).
+  3. A new vertical splitted window (command |:IkiJumpOrCreatePageVW|).
+  4. A new tab (command |:IkiJumpOrCreatePageNT|).
+
+==============================================================================
+COMMANDS AVAILABLE AND DEFAULT MAPPINGS  *ikiwiki-mappings* *ikiwiki-commands*
+
+                                                            *:IkiJumpToPageCW*
+Load the file associated to the link under the cursor in the current window.
+Mapped to <C-h> by default.
+
+                                                            *:IkiJumpToPageHW*
+Load the file associated to the link under the cursor in a new horizontal
+window. Mapped to <C-j> by default.
+
+                                                            *:IkiJumpToPageVW*
+Load the file associated to the link under the cursor in a new vertical
+window. Mapped to <C-k> by default.
+
+                                                            *:IkiJumpToPageNT*
+Load the file associated to the link under the cursor in a new tab. Mapped to
+<C-l> by default.
+
+                                                      *:IkiJumpOrCreatePageCW*
+Load the buffer of the new page indicated by the link under the cursor in the
+current window. Mapped to <Leader>h by default.
+
+                                                      *:IkiJumpOrCreatePageHW*
+Load the buffer of the new page indicated by the link under the cursor in a
+new horizontal window. Mapped to <Leader>j by default.
+
+                                                      *:IkiJumpOrCreatePageVW*
+Load the buffer of the new page indicated by the link under the cursor in a
+new vertical window. Mapped to <Leader>k by default.
+
+                                                      *:IkiJumpOrCreatePageNT*
+Load the buffer of the new page indicated by the link under the cursor in a
+new tab. Mapped to <Leader>l by default.
+
+                                                            *:IkiNextWikiLink*
+
+                                                            *:IkiPrevWikiLink*
+
+==============================================================================
+REDEFINE MAPPINGS                                      *ikiwiki-redefine-maps*
+
+vim:tw=78:ts=8:ft=help:norl:
