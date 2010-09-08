@@ -23,7 +23,9 @@ Redefine mappings                                      |ikiwiki-redefine-maps|
 LINK NAME COMPLETION                                           *ikiwiki-compl*
 
 It completes links in a directory-wise fashion through the omni-completion
-mechanism. This takes into account 
+mechanism. This takes into account the ikiwiki subpage linking rules, by
+checking "upwards" the directory tree to find the directory path that best
+fits the structure defined by the link.
 
 It completes not only pages, but files and directories.
 
