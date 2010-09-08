@@ -301,7 +301,16 @@ endfunction "}}}1
 " name) will be created. If not, an error message indicating that the page
 " does not exist will be printed
 "
-function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
+function! ikiwiki#nav#GoToWikiPage(create_page, mode) " {{{1
+  if a:mode == g:IKI_BUFFER
+    let focmd = 'e '
+  elseif a:mode == g:IKI_HSPLIT
+    let focmd = 'split '
+  elseif a:mode == g:IKI_VSPLIT
+    let focmd = 'vsplit '
+  else
+    let focmd = 'tabe '
+  endif
   let wl_text = s:WikiLinkText()
   if wl_text == ''
     echo "No wikilink found under the cursor"
@@ -320,7 +329,7 @@ function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
     call add(exs_dirs, plinkloc[0])
     let stdlinkform = plinkloc[0]
     if len(plinkloc) == 1
-      exec 'e ' .stdlinkform[0]
+      exec focmd .stdlinkform[0]
       return
     endif
   endfor
@@ -348,7 +357,7 @@ function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
     return
   endif
   let fn = ndir . '/' . pagname
-  exec 'e ' . fn
+  exec focmd . fn
 endfunction " }}}1
 
 " {{{1 Moves the cursor to the nearest WikiLink in the buffer

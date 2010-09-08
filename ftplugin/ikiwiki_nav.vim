@@ -43,6 +43,11 @@ let b:loaded_ikiwiki_nav = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
+" {{{1 constants for choosing how to open the selected file
+let g:IKI_BUFFER = 0
+let g:IKI_HSPLIT = 1
+let g:IKI_VSPLIT = 2
+let g:IKI_TAB = 3
 " command definitions {{{1
 if !exists(":IkiJumpToPage")
   command IkiJumpToPage :call ikiwiki#nav#GoToWikiPage(0)
