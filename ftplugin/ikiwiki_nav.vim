@@ -82,8 +82,8 @@ endif
 " }}}1
 
 " mapping definitions {{{1
-if !(hasmapto(':IkiJumpToPage'))
-  noremap <unique> <buffer> <CR> :IkiJumpToPage<CR>
+if !(hasmapto(':IkiJumpToPageCW'))
+  noremap <unique> <buffer> <CR> :IkiJumpToPageCW<CR>
 endif
 if !(hasmapto(':IkiJumpOrCreatePage'))
   noremap <unique> <buffer> <Leader>n :IkiJumpOrCreatePage<CR>
