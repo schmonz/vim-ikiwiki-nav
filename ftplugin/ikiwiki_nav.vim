@@ -43,21 +43,47 @@ let b:loaded_ikiwiki_nav = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
+" {{{1 constants for choosing how to open the selected file
+let g:IKI_BUFFER = 0
+let g:IKI_HSPLIT = 1
+let g:IKI_VSPLIT = 2
+let g:IKI_TAB = 3
 " command definitions {{{1
-if !exists(":IkiJumpToPage")
-  command IkiJumpToPage :call ikiwiki#nav#GoToWikiPage(0)
+if !exists(":IkiJumpToPageCW")
+  command IkiJumpToPageCW :call ikiwiki#nav#GoToWikiPage(0, g:IKI_BUFFER)
 endif
-if !exists(":IkiJumpOrCreatePage")
-  command IkiJumpOrCreatePage :call ikiwiki#nav#GoToWikiPage(1)
+if !exists(":IkiJumpToPageHW")
+  command IkiJumpToPageHW :call ikiwiki#nav#GoToWikiPage(0, g:IKI_HSPLIT)
+endif
+if !exists(":IkiJumpToPageVW")
+  command IkiJumpToPageVW :call ikiwiki#nav#GoToWikiPage(0, g:IKI_VSPLIT)
+endif
+if !exists(":IkiJumpToPageNT")
+  command IkiJumpToPageNT :call ikiwiki#nav#GoToWikiPage(0, g:IKI_TAB)
+endif
+if !exists(":IkiJumpOrCreatePageCW")
+  command IkiJumpOrCreatePageCW :call ikiwiki#nav#GoToWikiPage(1, g:IKI_BUFFER)
+endif
+if !exists(":IkiJumpOrCreatePageHW")
+  command IkiJumpOrCreatePageHW :call ikiwiki#nav#GoToWikiPage(1, g:IKI_HSPLIT)
+endif
+if !exists(":IkiJumpOrCreatePageVW")
+  command IkiJumpOrCreatePageVW :call ikiwiki#nav#GoToWikiPage(1, g:IKI_VSPLIT)
+endif
+if !exists(":IkiJumpOrCreatePageNT")
+  command IkiJumpOrCreatePageNT :call ikiwiki#nav#GoToWikiPage(1, g:IKI_TAB)
 endif
 if !exists(":IkiNextWikiLink")
-  command -nargs=1 IkiNextWikiLink :call ikiwiki#nav#NextWikiLink(<args>)
+  command IkiNextWikiLink :call ikiwiki#nav#NextWikiLink(0)
+endif
+if !exists(":IkiPrevWikiLink")
+  command IkiPrevWikiLink :call ikiwiki#nav#NextWikiLink(1)
 endif
 " }}}1
 
 " mapping definitions {{{1
-if !(hasmapto(':IkiJumpToPage'))
-  noremap <unique> <buffer> <CR> :IkiJumpToPage<CR>
+if !(hasmapto(':IkiJumpToPageCW'))
+  noremap <unique> <buffer> <CR> :IkiJumpToPageCW<CR>
 endif
 if !(hasmapto(':IkiJumpOrCreatePage'))
   noremap <unique> <buffer> <Leader>n :IkiJumpOrCreatePage<CR>

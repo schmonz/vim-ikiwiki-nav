@@ -107,8 +107,10 @@ Load the buffer of the new page indicated by the link under the cursor in a
 new tab. Mapped to <Leader>l by default.
 
                                                             *:IkiNextWikiLink*
+Move the cursor to the closest wikilink after it. Mapped to <C-n> by default.
 
                                                             *:IkiPrevWikiLink*
+Move the cursor to the closest wikilink before it. Mapped to <C-p> by default.
 
 ==============================================================================
 REDEFINE MAPPINGS                                      *ikiwiki-redefine-maps*
