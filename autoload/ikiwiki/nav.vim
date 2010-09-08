@@ -286,10 +286,10 @@ function! s:SelectLink(pos_locations) "{{{1
   endfor
   let choice = inputlist(opts)
   if choice <= 0 || choice >= len(opts)
-    return
+    return []
   endif
 
-  let pagespec = a:pos_locations[choice - 1][1][0]
+  let pagespec = pos_locations[choice - 1]
   let ndir = pagespec[0] . (pagespec[0] =~ '^/$' ? '' : '/') . pagespec[1]
   return [ndir, pagespec[2]]
 endfunction "}}}1
@@ -329,7 +329,7 @@ function! ikiwiki#nav#GoToWikiPage(create_page) " {{{1
     return
   endif
   let res = s:SelectLink(exs_dirs)
-  if !res
+  if len(res) == 0
     echomsg 'No option selected'
     return
   endif
