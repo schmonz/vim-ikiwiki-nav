@@ -240,6 +240,8 @@ endfunction " }}}1
 
 let s:DIR_WRITABLE = 2 " value returned by filewritable when a dir is writable
 let s:SEP = ' - '
+" TODO FIXME change sort to count not chars, but path elements. a Split should
+" be enough.
 function! s:SortOptions(opts) " {{{1
   if len(a:opts) <= 1
     return a:opts
