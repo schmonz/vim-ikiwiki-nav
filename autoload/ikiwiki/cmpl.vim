@@ -1,6 +1,5 @@
 " vim: fdm=marker
 
-
 " TODO see how does ikiwiki handle spaces in links, to define the policy to
 " handle them here
 
@@ -42,7 +41,6 @@ function! s:FindCplStart() " {{{1
   return li_loc + offset
 endfunction " }}}1
 
-
 function! s:IntersectPaths(p1, p2) " {{{1
   let i = 0
   let maxlen = min([strlen(a:p1), strlen(a:p2)])
@@ -50,19 +48,6 @@ function! s:IntersectPaths(p1, p2) " {{{1
     let i = i + 1
   endwhile
   return strpart(a:p1, 0, i)
-endfunction " }}}1
-
-" calculate for how many folders two given paths differ
-function! s:DirsDistance(d1, d2) " {{{1
-  let d1 = substitute(fnameescape(a:d1), '/\+', '/', 'g')
-  let d2 = substitute(fnameescape(a:d2), '/\+', '/', 'g')
-  if strlen(d1) < strlen(d2)
-    let tmp = d2
-    let d2 = d1
-    let d1 = tmp
-  endif
-  let dirs_left = substitute(d1, '^'.d2, '', '')
-  return len(split(dirs_left, '/'))
 endfunction " }}}1
 
 " {{{1 format a filename with its full path for proper presentation in the
@@ -105,11 +90,9 @@ function! s:FormatCmpl(fsname, base, partialpage) " {{{1
   let bufdir = expand('%:p:h')
   let cmpldir = fnamemodify(a:fsname, ':h')
   let common_dir = s:IntersectPaths(bufdir, cmpldir)
-  let dirdist = s:DirsDistance(common_dir, bufdir) + s:DirsDistance(common_dir, cmpldir)
-  let rv.menu = string(dirdist) ."-". rv.menu . " " . pathshorten(a:fsname)
+  let rv.menu = rv.menu . " " . pathshorten(a:fsname)
   return rv
 endfunction " }}}1
-
 
 " {{{1 checks a list of files, and adds <pathname>/index.mdwn
 " Intended to check which items of a given list are directories, and which of
