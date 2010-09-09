@@ -23,9 +23,38 @@ Redefine mappings                                      |ikiwiki-redefine-maps|
 LINK NAME COMPLETION                                           *ikiwiki-compl*
 
 It completes links in a directory-wise fashion through the omni-completion
-mechanism. This takes into account 
+mechanism. This takes into account the ikiwiki linking rules. From the ikiwiki
+docs: >
 
-It completes not only pages, but files and directories.
+  For example, if FooBar/SubPage links to "OtherPage", ikiwiki will first
+  prefer pointing the link to FooBar/SubPage/OtherPage if it exists, next to
+  FooBar/OtherPage and finally to OtherPage in the root of the wiki.
+
+  You can also specify a link that contains a directory name, like
+  "FooBar/OtherPage" to more exactly specify what page to link to. This is the
+  only way to link to an unrelated SubPage.
+
+  You can use this to, for example, to link from BazBar to "FooBar/SubPage", or
+  from BazBar/SubPage to "FooBar/SubPage".
+<
+
+It completes not only pages, but also files and directories.
+
+The completion mechanism is available when the cursor is after a wikilink
+opening ([[); when pressing <C-X><C-O>, a list of the possible completions is
+shown, ordered with the same criteria ikiwiki uses for searching a link
+target: first try ./pagename/, then ., then .., then ../.., and so on.
+
+The completion mechanism also filters the options offered considering the text
+you have already written in the link. For example, asking for completion in >
+
+  [[plugin/w
+            ^    cursor there
+<
+will present you only those options that match the previous text (plugin/w).
+
+This mechanism also works on named wikilinks ([[link text|link_definition]]),
+when the cursor is in the <link_definition> area.
 
 ==============================================================================
 JUMPING BETWEEN WIKILINKS                                  *ikiwiki-nav-links*
@@ -37,7 +66,7 @@ nearest wikilink ahead or behind the cursor, respectively.
 JUMPING TO PAGES                                           *ikiwiki-jump-page*
 
 When the cursor is over a wikilink, you can ask vim to open the file
-corresponding to the page which that link points to.
+corresponding to the page that link points to.
 
 There are 4 variants of this functionality. You can open the wiki page in:
 
@@ -49,25 +78,47 @@ There are 4 variants of this functionality. You can open the wiki page in:
 ==============================================================================
 CREATING PAGES                                           *ikiwiki-create-page*
 
-When the cursor is over a wikilink, the command :CreateWAWAWA makes vim try to
-open the file corresponding to the page the link points to, and if that fails,
-it offers the user the possibility of creating the page defined by the link.
-In this case, it offers the user a selection menu like the following:
->
-    Choose:
-    profit!
-<
-Once the user chooses one of the elements of the selection list, the file will
-be created, including the needed directories defined in the link, and opened
-in vim.
-
-There are 4 variants of this functionality. Once you select the page's base
-location you can open its buffer in:
+When the cursor is over a wikilink, you can also ask the plugin try to open
+the file corresponding to the page the link points to, and if that fails, to
+offer you the possibility of creating the page defined by the link. There are
+4 commands available to do this, in a similar fashion to the commands for
+jumping to pages. You can create the file for the new page and have its buffer
+oppened in:
 
   1. The current window, (command |:IkiJumpOrCreatePageCW|)
   2. A new horizontal splitted window (command |:IkiJumpOrCreatePageHW|).
   3. A new vertical splitted window (command |:IkiJumpOrCreatePageVW|).
   4. A new tab (command |:IkiJumpOrCreatePageNT|).
+
+All of these commands offer the user a selection menu like the following to
+ask him in which directory should be created the new page:
+>
+  Choose location of the link:
+  1. /home/jerojasro/ikiwiki/doc/plugins/ - new_plugin/discussion.mdwn
+  2. /home/jerojasro/ikiwiki/plugins/ - new_plugin/discussion.mdwn
+  3. /home/jerojasro/ikiwiki/doc/ikiwiki/directive/ - plugins/new_plugin/discussion.mdwn
+  4. /home/jerojasro/ikiwiki/doc/ikiwiki/ - plugins/new_plugin/discussion.mdwn
+  6. /home/jerojasro/ - plugins/new_plugin/discussion.mdwn
+  7. /home/ - plugins/new_plugin/discussion.mdwn
+  8. / - plugins/new_plugin/discussion.mdwn
+  Type number and <Enter> or click with mouse (empty cancels):  
+<
+Every element shown in the menu tells you:
+
+Which part (directories) of the new page exist already in the filesystem; this
+is the first part of the option, everything up to the " - " part.
+
+Which elements (directories and file) need to be created; all the elements
+after the " - " part.
+
+The list is sorted according with how many elements must be created for each
+base directory. The ordering of the list takes also into account if the link
+is relative ([[link/to/page]]) or absolute ([[/link/to/page]], see the leading
+slash).
+
+Once the user chooses one of the elements of the selection list, the file will
+be created, including the needed directories defined in the link, and opened
+in vim.
 
 ==============================================================================
 COMMANDS AVAILABLE AND DEFAULT MAPPINGS  *ikiwiki-mappings* *ikiwiki-commands*
@@ -112,5 +163,25 @@ Move the cursor to the closest wikilink before it. Mapped to <C-p> by default.
 
 ==============================================================================
 REDEFINE MAPPINGS                                      *ikiwiki-redefine-maps*
+
+==============================================================================
+BUGS                                                            *ikiwiki-bugs*
+
+The plugin can't figure out which is the root of the wiki; there is no
+information available to find this info in the repository alone. See the
+discussion in
+http://ikiwiki.info/forum/navigation_of_wiki_pages_on_local_filesystem_with_vim/
+to check the details of the problem.
+
+The completion for index-type links does not work properly yet. When
+there is, say, a file in mypage/index.mdwn, the completion should offer you
+the option "mypage" as pagename. Right now, "mypage/index" will be offered.
+
+Completion is available in front of \[[ text, despite it not being a proper
+wikilink opening.
+
+Completion will get activated when in front of an unmatched [[, or a |, even if
+they are not part of a wikilink, but of, e.g., `code segments`. This is a more 
+general case of the problem above.
 
 vim:tw=78:ts=8:ft=help:norl:
