@@ -78,18 +78,41 @@ endif
 " }}}1
 
 " mapping definitions {{{1
+" {{{2 page jumping
 if !(hasmapto(':IkiJumpToPageCW'))
   noremap <unique> <buffer> <CR> :IkiJumpToPageCW<CR>
+  noremap <unique> <buffer> <C-h> :IkiJumpToPageCW<CR>
 endif
-if !(hasmapto(':IkiJumpOrCreatePage'))
-  noremap <unique> <buffer> <Leader>n :IkiJumpOrCreatePage<CR>
+if !(hasmapto(':IkiJumpToPageHW'))
+  noremap <unique> <buffer> <C-j> :IkiJumpToPageHW<CR>
 endif
+if !(hasmapto(':IkiJumpToPageVW'))
+  noremap <unique> <buffer> <C-k> :IkiJumpToPageVW<CR>
+endif
+if !(hasmapto(':IkiJumpToPageNT'))
+  noremap <unique> <buffer> <C-l> :IkiJumpToPageNT<CR>
+endif
+" {{{2 page creation
+if !(hasmapto(':IkiJumpOrCreatePageCW'))
+  noremap <unique> <buffer> <Leader>h :IkiJumpOrCreatePageCW<CR>
+endif
+if !(hasmapto(':IkiJumpOrCreatePageHW'))
+  noremap <unique> <buffer> <Leader>j :IkiJumpOrCreatePageHW<CR>
+endif
+if !(hasmapto(':IkiJumpOrCreatePageVW'))
+  noremap <unique> <buffer> <Leader>k :IkiJumpOrCreatePageVW<CR>
+endif
+if !(hasmapto(':IkiJumpOrCreatePageNT'))
+  noremap <unique> <buffer> <Leader>l :IkiJumpOrCreatePageNT<CR>
+endif
+" {{{2 link navigation
 if !(hasmapto(':IkiNextWikiLink'))
-  noremap <buffer> <C-j> :IkiNextWikiLink 0<CR>
-  noremap <buffer> <C-k> :IkiNextWikiLink 1<CR>
+  noremap <buffer> <C-n> :IkiNextWikiLink<CR>
+endif
+if !(hasmapto(':IkiPrevWikiLink'))
+  noremap <buffer> <C-p> :IkiPrevWikiLink<CR>
 endif
 
-noremap <buffer> <Backspace> <C-o>
 " }}}1
 
 let &cpo = s:save_cpo
