@@ -29,10 +29,6 @@
 "
 " http://ikiwiki.info/ikiwiki/subpage/linkingrules/
 "
-" Bugs: it only works with wikilinks contained in only one line. E.g.,
-" [[hi there|hi_there]] works, but [[hi
-" there|hi_there]] doesn't
-"
 " }}}1
 
 if exists("b:loaded_ikiwiki_nav")

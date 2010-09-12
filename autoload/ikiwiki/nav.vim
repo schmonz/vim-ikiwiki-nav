@@ -240,8 +240,14 @@ endfunction " }}}1
 
 let s:DIR_WRITABLE = 2 " value returned by filewritable when a dir is writable
 let s:SEP = ' - '
-" TODO FIXME change sort to count not chars, but path elements. a Split should
-" be enough.
+" {{{1 Procedure to sort the options to be presented to the user when created a
+" new wiki page.
+"
+" this uses as sort criteria the amount of new elements that must be created for
+" the new page (directories, and file)
+"
+" Vim does have a sort method, but is isn't guaranteed that it is stable, hence
+" the reimplementation
 function! s:SortOptions(opts) " {{{1
   if len(a:opts) <= 1
     return a:opts
@@ -273,7 +279,8 @@ function! s:SortOptions(opts) " {{{1
   endwhile
   return res
 endfunction " }}}1
-"{{{1 creates a wiki page
+"{{{1 presents the user a list of posible locations to be used as the base
+"directory for the creation of a wiki page
 " }}}1
 function! s:SelectLink(pos_locations) "{{{1
   let pos_locations = s:SortOptions(a:pos_locations)
