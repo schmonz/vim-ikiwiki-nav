@@ -1,5 +1,5 @@
 " vim: fdm=marker
-" {{{1 Legalese
+" {{{1 LICENSE
 " Copyright: 2010 Javier Rojas <jerojasro@devnull.li>
 "
 " License:
@@ -19,15 +19,9 @@
 " ftplugin to navigate ikiwiki links from within vim
 "
 " Author: Javier Rojas <jerojasro@devnull.li>
-" Version:  1.0
-" Last Updated: FIXME
-" URL: TODO FIXME
-"
-" Usage: Hitting <CR> over a wikilink makes vim load the file associated with
-" it, if the file exists. To find the file associated with the wikilink, this
-" plugin uses the ikiwiki linking rules described in
-"
-" http://ikiwiki.info/ikiwiki/subpage/linkingrules/
+" Version:  2.0
+" Last Updated: 2010-09-12
+" URL: http://git.devnull.li/ikiwiki-nav.git/
 "
 " }}}1
 
