@@ -2,7 +2,6 @@
 
 Author: Javier Rojas <jerojasro@devnull.li>
 Version: TODO
-License: TODO
 
 ==============================================================================
 INTRODUCTION                                                   *ikiwiki-intro*
@@ -165,6 +164,17 @@ Move the cursor to the closest wikilink before it. Mapped to <C-p> by default.
 ==============================================================================
 REDEFINE MAPPINGS                                      *ikiwiki-redefine-maps*
 
+If you don't like the default value for the mappings defined for the commands
+of this plugin, you can remap them by defining your own mapping in the .vimrc
+file.
+
+For example, if you want to redefine the command used to jump to the next
+wikilink (|:IkiNextWikiLink|) to the <C-Right> key sequence, do the following:
+>
+  map <C-Right> :IkiNextWikiLink<CR>
+<
+You can do this for any of the commands provided by this plugin.
+
 ==============================================================================
 BUGS                                                            *ikiwiki-bugs*
 
@@ -184,5 +194,8 @@ wikilink opening.
 Completion will get activated when in front of an unmatched [[, or a |, even if
 they are not part of a wikilink, but of, e.g., `code segments`. This is a more 
 general case of the problem above.
+
+Feel free to report any problems you have with this plugin, or send
+suggestions, to the author.
 
 vim:tw=78:ts=8:ft=help:norl:
