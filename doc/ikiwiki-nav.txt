@@ -1,7 +1,7 @@
 *ikiwiki-nav.txt*	Ftplugin to help creation and navigation of ikiwiki pages
 
 Author: Javier Rojas <jerojasro@devnull.li>
-Version: TODO
+Version: 2.0
 
 ==============================================================================
 INTRODUCTION                                                   *ikiwiki-intro*
