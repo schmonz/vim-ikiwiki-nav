@@ -261,7 +261,7 @@ function! s:SortOptions(opts) " {{{1
   let iL = 0
   let iR = 0
   while iL < lL && iR < lR
-    if ((strlen(L[iL][1]) + strlen(L[iL][2])) - (strlen(R[iR][1]) + strlen(R[iR][2]))) <= 0
+    if (len(split(L[iL][1], '/')) - len(split(R[iR][1], '/'))) <= 0
       call add(res, L[iL])
       let iL = iL + 1
     else
