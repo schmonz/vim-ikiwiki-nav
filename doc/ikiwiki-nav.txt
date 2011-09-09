@@ -26,17 +26,16 @@ mechanism. This takes into account the ikiwiki subpage linking rules, by
 checking "upwards" the directory tree to find the directory path that best
 fits the structure defined by the link.
 
-  For example, if FooBar/SubPage links to "OtherPage", ikiwiki will first
-  prefer pointing the link to FooBar/SubPage/OtherPage if it exists, next to
-  FooBar/OtherPage and finally to OtherPage in the root of the wiki.
+For example, if FooBar/SubPage links to "OtherPage", ikiwiki will first
+prefer pointing the link to FooBar/SubPage/OtherPage if it exists, next to
+FooBar/OtherPage and finally to OtherPage in the root of the wiki.
 
-  You can also specify a link that contains a directory name, like
-  "FooBar/OtherPage" to more exactly specify what page to link to. This is the
-  only way to link to an unrelated SubPage.
+You can also specify a link that contains a directory name, like
+"FooBar/OtherPage" to more exactly specify what page to link to. This is the
+only way to link to an unrelated SubPage.
 
-  You can use this to, for example, to link from BazBar to "FooBar/SubPage", or
-  from BazBar/SubPage to "FooBar/SubPage".
-<
+You can use this to, for example, to link from BazBar to "FooBar/SubPage", or
+from BazBar/SubPage to "FooBar/SubPage".
 
 It completes not only pages, but also files and directories.
 
