@@ -16,6 +16,7 @@ Jumping between wikilinks                                  |ikiwiki-nav-links|
 Jumping to pages                                           |ikiwiki-jump-page|
 Creating pages                                           |ikiwiki-create-page|
 Commands available and default mappings                     |ikiwiki-commands|
+Troubleshooting mappings                                |ikiwiki-map-problems|
 Redefine mappings                                      |ikiwiki-redefine-maps|
 
 ==============================================================================
