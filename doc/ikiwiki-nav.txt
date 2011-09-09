@@ -161,6 +161,21 @@ Move the cursor to the closest wikilink after it. Mapped to <C-n> by default.
 Move the cursor to the closest wikilink before it. Mapped to <C-p> by default.
 
 ==============================================================================
+TROUBLESHOOTING MAPPINGS                                *ikiwiki-map-problems*
+
+Since version 2.0.1, ikiwiki-nav creates every default mapping only if:
+
+  - The |{lhs}| of the mapping is not used in an already-defined map.
+  - The |{rhs}| of the mapping doesn't have any mapping yet.
+
+This is done to avoid interfering with existent mappings.
+
+If one of the default maps for ikiwiki-nav doesn't work for you, it is
+possible that the ikiwiki-nav map is being shadowed by another map that you
+(or another Vim plugin) have defined. This can by solved by redefining the
+map in your .vimrc file, or putting it in after/ftplugin/ikiwiki.vim.
+
+==============================================================================
 REDEFINE MAPPINGS                                      *ikiwiki-redefine-maps*
 
 If you don't like the default value for the mappings defined for the commands
@@ -170,7 +185,7 @@ file.
 For example, if you want to redefine the command used to jump to the next
 wikilink (|:IkiNextWikiLink|) to the <C-Right> key sequence, do the following:
 >
-  map <C-Right> :IkiNextWikiLink<CR>
+  nmap <C-Right> :IkiNextWikiLink<CR>
 <
 You can do this for any of the commands provided by this plugin.
 
