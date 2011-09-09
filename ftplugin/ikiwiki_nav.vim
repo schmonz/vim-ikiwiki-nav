@@ -74,7 +74,7 @@ endif
 " mapping definitions {{{1
 " {{{2 helper to define mappings
 function! s:safe_map(keys, command)
-  if !hasmapto(a:command) && maparg(a:keys) == ""
+  if !hasmapto(a:command, 'n') && maparg(a:keys, 'n') == ""
     execute 'noremap <unique> <buffer> ' a:keys a:command '<CR>'
   endif
 endfunction
